@@ -1,0 +1,15 @@
+name: CI
+
+ on:
+   workflow_dispatch:
+
+ jobs:
+   build:
+     runs-on: ubuntu-latest
+
+     steps:
+       - name: Get Your Code
+         uses: actions/checkout@v2
+
+       - name: Say Hello to the World
+         run: echo "Hello, World!"
