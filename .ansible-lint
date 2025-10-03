@@ -1,3 +1,5 @@
 # Tell ansible-lint where to find custom rules
 rulesdir:
-  - ./rules
+  - rules
+enable_list:
+  - CUSTOM001
