@@ -6,10 +6,13 @@ class HardcodedPasswordRule(AnsibleLintRule):
     description = "Avoid hardcoding passwords in playbooks"
     severity = "HIGH"
     tags = ["security"]
-    version_changed  = "6.0.0"
+    version_changed  = "25.9.1"
 
-    def matchtask(self, file, task):
-        # Check if any sensitive key has a hardcoded string
+    def matchtask(self, task, file=None):
+        """
+        task: dict of the task
+        file: optional, filename
+        """
         for key in ["password", "passwd"]:
             if key in task and isinstance(task[key], str):
                 return True
