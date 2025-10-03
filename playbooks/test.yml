@@ -1,6 +1,6 @@
 ---
-- name: Playbook with hardcoded password
-  hosts: all
+- name: Test playbook with hardcoded password
+  hosts: localhost
   tasks:
     - name: Create user with hardcoded password
       user:
