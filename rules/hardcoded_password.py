@@ -7,6 +7,7 @@ class HardCodedPasswordRule(AnsibleLintRule):
     description = "Avoid hardcoding passwords in playbooks, tasks, or roles, including templated passwords."
     severity = "HIGH"
     tags = ["security", "passwords"]
+    version_changed  = "25.9.1"
 
     # Regex to catch patterns like password: "value", password = 'value', or Jinja2 templates
     regex = re.compile(
