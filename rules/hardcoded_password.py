@@ -1,37 +1,29 @@
-from ansiblelint.rules import AnsibleLintRule
+import os
+import re
 
-class HardcodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM001"
-    shortdesc = "Hardcoded password detected"
-    description = "Avoid hardcoding passwords anywhere in tasks"
-    severity = "HIGH"
-    tags = ["security"]
+PLAYBOOK_DIR = "playbooks"
 
-    SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
+PASSWORD_PATTERN = re.compile(
+    r'^\s*(password|passwd|secret|token)\s*:\s*["\']?.+["\']?', re.IGNORECASE
+)
 
-    def matchtask(self, task, file=None):
-        """
-        Check for hardcoded passwords and return line numbers for reporting
-        """
-        matches = []
+def scan_file(file_path):
+    results = []
+    with open(file_path, "r") as f:
+        for lineno, line in enumerate(f, start=1):
+            if PASSWORD_PATTERN.search(line):
+                results.append(f"{file_path}:{lineno}: [CUSTOM001] Hardcoded password detected")
+    return results
 
-        # Recursively check the task
-        def _check(obj):
-            if isinstance(obj, dict):
-                for k, v in obj.items():
-                    if k in self.SENSITIVE_KEYS and isinstance(v, str):
-                        matches.append(getattr(task, "__line__", None))
-                    _check(v)
-            elif isinstance(obj, list):
-                for item in obj:
-                    _check(item)
+def scan_directory(directory):
+    all_results = []
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.endswith((".yml", ".yaml")):
+                all_results.extend(scan_file(os.path.join(root, file)))
+    return all_results
 
-        _check(task)
-
-        # Return a list of dictionaries with line numbers and messages
-        return [
-            {
-                "linenumber": linen or 0,  # fallback if line number not found
-                "message": f"[{self.id}] {self.shortdesc}"
-            } for linen in matches
-        ]
+if __name__ == "__main__":
+    results = scan_directory(PLAYBOOK_DIR)
+    for r in results:
+        print(r)
