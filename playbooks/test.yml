@@ -1,7 +1,15 @@
 - hosts: localhost
   gather_facts: false
+  vars:
+    my_secret: "hardcoded123"
   tasks:
     - name: Example task with hardcoded password
       user:
         name: testuser
         password: "supersecret"
+
+    - name: Task with nested vars
+      debug:
+        msg:
+          inner:
+            passwd: "nestedsecret"
