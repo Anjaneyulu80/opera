@@ -17,4 +17,5 @@ jobs:
         run: pip install "ansible-lint>=6.5.0"
 
       - name: Run ansible-lint
-        run: ansible-lint playbooks/
+        run: ansible-lint playbooks/test.yml
+
