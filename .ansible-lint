@@ -1,8 +1,2 @@
-warn_list:
-  - experimental
-
 rulesdir:
   - ./rules
-
-enable_list:
-  - CUSTOM001   # enable our custom hardcoded password rule
