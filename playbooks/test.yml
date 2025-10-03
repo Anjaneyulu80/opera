@@ -1,0 +1,8 @@
+---
+- name: Playbook with hardcoded password
+  hosts: all
+  tasks:
+    - name: Create user with hardcoded password
+      user:
+        name: demo
+        password: "PlainTextPass123!"
