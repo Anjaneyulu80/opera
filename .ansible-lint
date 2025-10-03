@@ -1,5 +1,5 @@
 rulesdir:
-  - ./rules
+  - rules
 
 enable_list:
   - CUSTOM001
