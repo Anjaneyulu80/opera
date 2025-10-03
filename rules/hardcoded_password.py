@@ -3,17 +3,34 @@ from ansiblelint.rules import AnsibleLintRule
 class HardcodedPasswordRule(AnsibleLintRule):
     id = "CUSTOM001"
     shortdesc = "Hardcoded password detected"
-    description = "Avoid hardcoding passwords in playbooks"
+    description = "Avoid hardcoding passwords anywhere in tasks"
     severity = "HIGH"
     tags = ["security"]
-    version_changed  = "25.9.1"
+
+    SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
 
     def matchtask(self, task, file=None):
         """
-        task: dict of the task
-        file: optional, filename
+        Recursively check if any sensitive key has a hardcoded string
         """
-        for key in ["password", "passwd"]:
-            if key in task and isinstance(task[key], str):
+        return self._check_dict(task)
+
+    def _check_dict(self, d):
+        if isinstance(d, dict):
+            for k, v in d.items():
+                if k in self.SENSITIVE_KEYS and isinstance(v, str):
+                    return True
+                # Recursive check for nested dicts or lists
+                if isinstance(v, dict) and self._check_dict(v):
+                    return True
+                if isinstance(v, list) and self._check_list(v):
+                    return True
+        return False
+
+    def _check_list(self, l):
+        for item in l:
+            if isinstance(item, dict) and self._check_dict(item):
+                return True
+            if isinstance(item, list) and self._check_list(item):
                 return True
         return False
