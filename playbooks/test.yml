@@ -1,9 +1,7 @@
 - hosts: localhost
   gather_facts: false
-  vars:
-    my_secret: "hardcoded123"
   tasks:
-    - name: Hardcoded password task
+    - name: Hardcoded password
       user:
         name: testuser
         password: "supersecret"
