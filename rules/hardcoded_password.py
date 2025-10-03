@@ -7,37 +7,31 @@ class HardcodedPasswordRule(AnsibleLintRule):
     severity = "HIGH"
     tags = ["security"]
 
-    # Keys to check for hardcoded values
     SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
 
     def matchtask(self, task, file=None):
         """
-        Recursively check if any sensitive key has a hardcoded string
+        Check for hardcoded passwords and return line numbers for reporting
         """
-        return self._check_dict(task)
+        matches = []
 
-    def _check_dict(self, d):
-        if not isinstance(d, dict):
-            return False
+        # Recursively check the task
+        def _check(obj):
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    if k in self.SENSITIVE_KEYS and isinstance(v, str):
+                        matches.append(getattr(task, "__line__", None))
+                    _check(v)
+            elif isinstance(obj, list):
+                for item in obj:
+                    _check(item)
 
-        for k, v in d.items():
-            if k in self.SENSITIVE_KEYS and isinstance(v, str):
-                return True
+        _check(task)
 
-            # Recursive check for nested dicts
-            if isinstance(v, dict) and self._check_dict(v):
-                return True
-
-            # Recursive check for lists
-            if isinstance(v, list) and self._check_list(v):
-                return True
-
-        return False
-
-    def _check_list(self, l):
-        for item in l:
-            if isinstance(item, dict) and self._check_dict(item):
-                return True
-            if isinstance(item, list) and self._check_list(item):
-                return True
-        return False
+        # Return a list of dictionaries with line numbers and messages
+        return [
+            {
+                "linenumber": linen or 0,  # fallback if line number not found
+                "message": f"[{self.id}] {self.shortdesc}"
+            } for linen in matches
+        ]
