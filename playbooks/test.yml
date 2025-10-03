@@ -1,8 +1,13 @@
 ---
-- name: Test playbook with hardcoded password
+- name: Test hardcoded passwords
   hosts: localhost
+  vars:
+    db_password: "MySecret123"    # This should trigger CUSTOM001
+
   tasks:
-    - name: Create user with hardcoded password
-      user:
-        name: demo
-        password: "PlainTextPass123!"
+    - name: Print password (for testing lint)
+      debug:
+        msg: "Database password is {{ db_password }}"
+
+    - name: Example task with inline password
+      shell: echo "Password=SuperSecret!"
