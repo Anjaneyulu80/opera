@@ -1,29 +1,34 @@
-import os
-import re
+from ansiblelint.rules import AnsibleLintRule
 
-PLAYBOOK_DIR = "playbooks"
+class HardcodedPasswordRule(AnsibleLintRule):
+    id = "CUSTOM001"
+    shortdesc = "Hardcoded password detected"
+    description = "Avoid hardcoding passwords anywhere in tasks"
+    severity = "HIGH"
+    tags = ["security"]
 
-PASSWORD_PATTERN = re.compile(
-    r'^\s*(password|passwd|secret|token)\s*:\s*["\']?.+["\']?', re.IGNORECASE
-)
+    SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
 
-def scan_file(file_path):
-    results = []
-    with open(file_path, "r") as f:
-        for lineno, line in enumerate(f, start=1):
-            if PASSWORD_PATTERN.search(line):
-                results.append(f"{file_path}:{lineno}: [CUSTOM001] Hardcoded password detected")
-    return results
+    def matchtask(self, task, file=None):
+        """
+        Detect hardcoded passwords and return line numbers
+        """
+        matches = []
 
-def scan_directory(directory):
-    all_results = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith((".yml", ".yaml")):
-                all_results.extend(scan_file(os.path.join(root, file)))
-    return all_results
+        def _check(obj):
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    if k in self.SENSITIVE_KEYS and isinstance(v, str):
+                        # fallback: no line numbers, ansible-lint will mark the task
+                        matches.append(0)
+                    _check(v)
+            elif isinstance(obj, list):
+                for item in obj:
+                    _check(item)
 
-if __name__ == "__main__":
-    results = scan_directory(PLAYBOOK_DIR)
-    for r in results:
-        print(r)
+        _check(task)
+
+        return [
+            {"linenumber": linen or 0, "message": f"[{self.id}] {self.shortdesc}"}
+            for linen in matches
+        ]
