@@ -5,4 +5,4 @@
     - name: Create user with hardcoded password
       user:
         name: demo
-        password: PlainTextPass123!
+        password: "PlainTextPass123!"
