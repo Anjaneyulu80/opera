@@ -6,7 +6,9 @@ class HardcodedPasswordRule(AnsibleLintRule):
     description = "Avoid hardcoding passwords anywhere in tasks"
     severity = "HIGH"
     tags = ["security"]
+    version_changed  = "25.9.1"
 
+    # Keys to check for hardcoded values
     SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
 
     def matchtask(self, task, file=None):
@@ -16,15 +18,21 @@ class HardcodedPasswordRule(AnsibleLintRule):
         return self._check_dict(task)
 
     def _check_dict(self, d):
-        if isinstance(d, dict):
-            for k, v in d.items():
-                if k in self.SENSITIVE_KEYS and isinstance(v, str):
-                    return True
-                # Recursive check for nested dicts or lists
-                if isinstance(v, dict) and self._check_dict(v):
-                    return True
-                if isinstance(v, list) and self._check_list(v):
-                    return True
+        if not isinstance(d, dict):
+            return False
+
+        for k, v in d.items():
+            if k in self.SENSITIVE_KEYS and isinstance(v, str):
+                return True
+
+            # Recursive check for nested dicts
+            if isinstance(v, dict) and self._check_dict(v):
+                return True
+
+            # Recursive check for lists
+            if isinstance(v, list) and self._check_list(v):
+                return True
+
         return False
 
     def _check_list(self, l):
