@@ -1,16 +1,13 @@
 from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.utils import LINE_NUMBER_KEY
 
-class HardcodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM001"
-    shortdesc = "Hardcoded password detected"
-    description = "Avoid hardcoding passwords anywhere in tasks"
-    severity = "HIGH"
-    tags = ["security"]
+class TaskNameRule(AnsibleLintRule):
+    id = 'CUSTOM001'
+    shortdesc = 'All tasks should have a name'
+    description = 'Every task in a playbook should have a name field.'
+    severity = 'HIGH'
+    tags = ['formatting']
 
-    SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
-
-    def matchtask(self, task, file=None):
-        """
-        Detect hardcoded passwords and return line numbers
-        """
-        matches = []
+    def matchtask(self, file, task):
+        # Return True if rule is violated
+        return 'name' not in task
