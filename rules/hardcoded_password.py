@@ -1,53 +1,64 @@
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
+import re
 
-class NoHardcodedPasswordsRule(AnsibleLintRule):
-    id = 'CUSTOM001'
-    shortdesc = 'Avoid hardcoded passwords'
-    description = 'Passwords should not be hardcoded in playbooks'
-    severity = 'HIGH'
-    tags = ['security']
-    version_changed = '7.0.0'
+class HardCodedPasswordRule(AnsibleLintRule):
+    id = "CUSTOM001"
+    shortdesc = "Hardcoded password detected"
+    description = (
+        "Avoid hardcoding passwords or secrets in playbooks, variables, or tasks. "
+        "Use Ansible Vault, environment variables, or external secrets managers instead."
+    )
+    severity = "HIGH"
+    tags = ["security", "passwords", "badpractice"]
 
-    # List of keys to detect
-    SECRET_KEYS = [
-        'password', 'passwd', 'pass', 'secret', 'api_key',
-        'token', 'access_key', 'secret_key', 'client_secret'
-    ]
+    # Keys to check for sensitive information
+    common_password_keys = ["password", "passwd", "secret", "token"]
 
-    # Placeholder values to ignore
-    PLACEHOLDERS = ('<tbd>', 'changeme', 'change-me', 'your_password', 'dummy', 'example', 'none')
+    # Regex for detecting hardcoded values in YAML/variables
+    regex = re.compile(r'(?i)\b(password|passwd|secret|token)\b\s*[:=]\s*["\'].*["\']')
 
-    def matchyaml(self, file, yaml_data):
-        matches = []
+    def matchtask(self, file, task):
+        """
+        Recursively check task arguments for hardcoded password-like fields.
+        Ignores templated variables and vault references.
+        """
+        def check_dict(d):
+            for k, v in d.items():
+                key_lower = k.lower()
+                if key_lower in self.common_password_keys and isinstance(v, str):
+                    # Skip templated variables and vault references
+                    if "{{" in v or "}}" in v:
+                        continue
+                    if "!vault" in v.lower():
+                        continue
+                    return True
+                # Check nested dictionaries
+                if isinstance(v, dict):
+                    if check_dict(v):
+                        return True
+                # Check lists of dictionaries (loops, etc.)
+                if isinstance(v, list):
+                    for item in v:
+                        if isinstance(item, dict) and check_dict(item):
+                            return True
+            return False
 
-        def scan(d, path=''):
-            """
-            Recursively scan dict/list for keys containing secrets.
-            """
-            if isinstance(d, dict):
-                for k, v in d.items():
-                    full_path = f"{path}/{k}" if path else k
+        return check_dict(task)
 
-                    if any(sk in k.lower() for sk in self.SECRET_KEYS):
-                        if isinstance(v, str):
-                            lower = v.lower()
-                            if '{{' not in v and not any(ph in lower for ph in self.PLACEHOLDERS):
-                                # Return a dict with line number info if available
-                                line_info = getattr(v, LINE_NUMBER_KEY, None)
-                                # Preview truncated to 60 chars
-                                preview = v if len(v) <= 60 else v[:57] + "..."
-                                matches.append({
-                                    LINE_NUMBER_KEY: line_info,
-                                    'key_path': full_path,
-                                    'value_preview': preview
-                                })
-
-                    scan(v, full_path)
-
-            elif isinstance(d, list):
-                for idx, item in enumerate(d):
-                    scan(item, f"{path}[{idx}]")
-
-        scan(yaml_data)
-        return matches
+    def matchlines(self, file, text):
+        """
+        Scan raw text lines for hardcoded passwords.
+        Ignores templated variables and vault references.
+        Returns list of (lineno, line) tuples.
+        """
+        results = []
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            match = self.regex.search(line)
+            if match:
+                # Skip templated or vault-protected lines
+                if "{{" in line or "}}" in line:
+                    continue
+                if "!vault" in line.lower():
+                    continue
+                results.append((lineno, line.strip()))
+        return results
