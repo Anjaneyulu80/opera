@@ -44,7 +44,7 @@ jobs:
       - name: Verify custom rule loads
         run: |
           echo "Listing rules..."
-          ansible-lint --list-rules | grep HC100 || (echo "❌ Custom rule not loaded!" && exit 1)
+          ansible-lint --list-rules | grep CUSTOM001 || (echo "❌ Custom rule not loaded!" && exit 1)
 
       # 7. Verify playbook exists
       - name: Verify playbook path
