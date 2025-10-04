@@ -5,7 +5,6 @@ class HardcodedPasswordRule(AnsibleLintRule):
     id = 'HC100'
     shortdesc = 'Avoid hard-coded passwords'
     description = 'Passwords should not be hard-coded in playbooks or vars'
-    severity = 'HIGH'
     tags = ['security', 'password']
 
     def matchtask(self, file, task):
