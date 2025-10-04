@@ -1,22 +1,19 @@
+# playbooks/sample_hardcoded.yml
 ---
-- name: Sample playbook with hard-coded passwords
-  hosts: all
-  become: yes
-
-  vars:
-    db_user: "admin"
-    db_password: "P@ssw0rd123"   # Hard-coded password (intentional)
+- name: Sample playbook with hard-coded password
+  hosts: localhost
+  gather_facts: no
 
   tasks:
     - name: Create database user with hard-coded password
       community.mysql.mysql_user:
-        name: "{{ db_user }}"
-        password: "{{ db_password }}"
+        name: "admin"
+        password: "P@ssw0rd123"  # Hard-coded password
         priv: "mydb.*:ALL"
         state: present
 
     - name: Create a file with a hard-coded password
       copy:
         dest: "/tmp/secret.txt"
-        content: "DB password is {{ db_password }}"
+        content: "DB password is P@ssw0rd123"
         mode: '0600'
