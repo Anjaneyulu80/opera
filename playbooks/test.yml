@@ -1,13 +1,22 @@
-- hosts: localhost
-  gather_facts: false
+# playbooks/deploy_app.yml
+- name: Deploy example app (insecure: hardcoded passwords)
+  hosts: app_servers
+  become: yes
+  vars:
+    db_user: "app_user"
+    db_password: "Test123"   # <-- Hardcoded secret
   tasks:
-    - name: Hardcoded password
-      ansible.builtin.user:
-        name: testuser
-        password: "supersecret"
+    - name: Ensure app directory exists
+      file:
+        path: /opt/example_app
+        state: directory
+        owner: "{{ db_user }}"
+        mode: '0755'
 
-    - name: Nested password
-      ansible.builtin.debug:
-        msg:
-          inner:
-            passwd: "nestedsecret"
+    - name: Create database user (example)
+      community.mysql.mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "example_db.*:ALL"
+        state: present
+      delegate_to: db.example.internal
