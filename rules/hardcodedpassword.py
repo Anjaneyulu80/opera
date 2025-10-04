@@ -2,12 +2,12 @@ from ansiblelint.rules import AnsibleLintRule
 from ansiblelint.utils import LINE_NUMBER_KEY
 
 class HardCodedPasswordRule(AnsibleLintRule):
-    id = '999'
+    id = 'CUSTOM001'
     shortdesc = 'Avoid hardcoded passwords'
     description = 'Passwords or secrets should not be hardcoded in playbooks'
     severity = 'HIGH'
     tags = ['security']
-    version_added = '1.0.0'
+    version_added = '6.0.0'
 
     # Keys to detect as secrets
     SECRET_KEYS = ['password', 'passwd', 'pass', 'secret', 'api_key', 'token']
