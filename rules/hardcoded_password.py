@@ -10,44 +10,51 @@ class HardCodedPasswordRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["security", "passwords", "badpractice"]
+    version_changed = "1.0.0"  # Required in v6+
 
-    # Regex to detect hardcoded passwords in YAML/variables
-    regex = re.compile(
-        r'(?i)\b(password|passwd|secret|token)\b\s*[:=]\s*["\'].*["\']'
-    )
-
-    # Common password-related task argument keys
+    # Keys to check for sensitive data
     common_password_keys = ["password", "passwd", "secret", "token"]
+
+    # Regex to detect hardcoded secrets in YAML/variables
+    regex = re.compile(r'(?i)\b(password|passwd|secret|token)\b\s*[:=]\s*["\'].*["\']')
 
     def matchtask(self, file, task):
         """
-        Check task arguments for hardcoded password-like fields.
-        Ignores templated variables and vault references.
+        Recursively check task arguments for hardcoded password-like fields.
+        Ignores templated variables and Vault references.
         """
-        for key, value in task.get("__ansible_task_arguments__", {}).items():
-            key_lower = key.lower()
-            if key_lower in self.common_password_keys and isinstance(value, str):
-                # Ignore templated values and vault references
-                if "{{" in value and "}}" in value:
-                    continue
-                if "vault_" in value.lower():
-                    continue
-                return True
-        return False
+        def check_dict(d):
+            for k, v in d.items():
+                key_lower = k.lower()
+                if key_lower in self.common_password_keys and isinstance(v, str):
+                    # Skip templated or Vault-protected values
+                    if "{{" in v or "}}" in v or "!vault" in v.lower():
+                        continue
+                    return True
+                # Check nested dictionaries
+                if isinstance(v, dict) and check_dict(v):
+                    return True
+                # Check lists of dictionaries (e.g., loops)
+                if isinstance(v, list):
+                    for item in v:
+                        if isinstance(item, dict) and check_dict(item):
+                            return True
+            return False
 
-    def matchlines(self, file, text):
+        return check_dict(task)
+
+    def matchlines(self, file, text=None):
         """
-        Scan raw text lines for hardcoded passwords.
-        Ignores templated variables and vault references.
+        Scan raw lines for hardcoded passwords.
+        Ignores templated variables and Vault references.
         """
+        if text is None:
+            text = file.contents
+
         results = []
         for lineno, line in enumerate(text.splitlines(), start=1):
-            match = self.regex.search(line)
-            if match:
-                # Ignore lines with templated variables or vault references
-                if "{{" in line or "}}" in line:
-                    continue
-                if "vault_" in line.lower():
+            if self.regex.search(line):
+                if "{{" in line or "}}" in line or "!vault" in line.lower():
                     continue
                 results.append((lineno, line.strip()))
         return results
