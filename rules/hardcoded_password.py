@@ -6,7 +6,7 @@ class NoHardcodedPasswordsRule(AnsibleLintRule):
     description = 'Passwords should not be hardcoded in playbooks'
     severity = 'HIGH'
     tags = ['security']
-    version_added = '1.0.0'
+    version_added = '6.0.0'
 
     def matchyaml(self, file, yaml_data):
         matches = []
