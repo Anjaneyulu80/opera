@@ -2,11 +2,9 @@ name: Lint Ansible Playbooks
 
 on:
   push:
-    branches: 
-      - "main"
+    branches: [ "main" ]
   pull_request:
-    branches: 
-      - "main"
+    branches: [ "main" ]
 
 jobs:
   ansible-lint:
@@ -19,11 +17,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
 
-      - name: Install ansible-lint 6.0.0
+      - name: Install Ansible & ansible-lint 6.0.0
         run: |
           python -m pip install --upgrade pip
+          pip install ansible==5.7.0
           pip install ansible-lint==6.0.0
 
       - name: Run ansible-lint
