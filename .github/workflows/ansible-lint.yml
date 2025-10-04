@@ -31,7 +31,7 @@ jobs:
       - name: Verify custom rules
         run: |
           echo "Installed ansible-lint rules:"
-          ansible-lint --list-rules | grep CUSTOM001 || (echo "❌ Custom rule not loaded!" && exit 1)
+          ansible-lint --list-rules | grep CUSTOM001 
 
       - name: Verify playbook path
         run: ls -l $GITHUB_WORKSPACE/playbooks/test.yml
