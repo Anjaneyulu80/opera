@@ -7,7 +7,7 @@ class HardCodedPasswordRule(AnsibleLintRule):
     description = "Avoid hardcoding passwords directly in playbooks or tasks"
     severity = "HIGH"
     tags = ["security"]
-    version_changed  = "6.0.0"
+    version_changed  = "7.0.0"
 
     def matchtask(self, task, file):
         results = []
