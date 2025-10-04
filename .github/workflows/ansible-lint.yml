@@ -37,4 +37,5 @@ jobs:
         run: |
           echo "Running ansible-lint..."
           ansible-lint -r $HOME/.ansible-lint/rules/hardcoded_password.py $GITHUB_WORKSPACE/playbooks/test.yml
+          ansible-lint --list-rules
         shell: bash
