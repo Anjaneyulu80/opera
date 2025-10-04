@@ -36,6 +36,4 @@ jobs:
       - name: Run ansible-lint
         run: |
           echo "Running ansible-lint..."
-          ansible-lint -r $HOME/.ansible-lint/rules/hardcoded_password.py
-          ansible-lint --list-rules
-        shell: bash
+          ansible-lint -R $HOME/.ansible-lint/rules/
