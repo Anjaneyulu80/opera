@@ -6,7 +6,7 @@ class NoHardcodedPasswordsRule(AnsibleLintRule):
     description = 'Passwords should not be hardcoded in playbooks'
     severity = 'HIGH'
     tags = ['security']
-    version_added = '6.0.0'
+    version_added = '6.0.0'  # ✅ required
 
     def matchyaml(self, file, yaml_data):
         matches = []
@@ -17,7 +17,7 @@ class NoHardcodedPasswordsRule(AnsibleLintRule):
                     full_path = f"{path}/{k}" if path else k
                     if 'password' in k.lower():
                         if isinstance(v, str) and '{{' not in v:
-                            matches.append(f"{full_path}: {v}")
+                            matches.append(full_path)
                     scan_dict(v, full_path)
             elif isinstance(d, list):
                 for idx, item in enumerate(d):
