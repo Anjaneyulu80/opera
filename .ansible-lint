@@ -1,2 +1,2 @@
 rulesdir:
-  - /rules
+  - ./rules
