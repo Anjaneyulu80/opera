@@ -2,12 +2,12 @@
   gather_facts: false
   tasks:
     - name: Hardcoded password
-      user:
+      ansible.builtin.user:
         name: testuser
         password: "supersecret"
 
     - name: Nested password
-      debug:
+      ansible.builtin.debug:
         msg:
           inner:
             passwd: "nestedsecret"
