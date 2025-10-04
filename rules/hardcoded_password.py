@@ -1,29 +1,20 @@
+# ansible-lint-rules/hardcoded_password.py
 from ansiblelint.rules import AnsibleLintRule
 
 class HardcodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM001"
-    shortdesc = "Hardcoded password detected"
-    description = "Avoid hardcoding passwords anywhere in tasks"
-    severity = "HIGH"
-    tags = ["security"]
-    version_added = "25.9.1"
+    id = 'HC100'
+    shortdesc = 'Avoid hard-coded passwords'
+    description = 'Passwords should not be hard-coded in playbooks or vars'
+    severity = 'HIGH'
+    tags = ['security', 'password']
 
-    SENSITIVE_KEYS = ["password", "passwd", "secret", "token", "db_password"]
-
-    def matchtask(self, task, file=None):
-        def _check(obj):
-            if isinstance(obj, dict):
-                for k, v in obj.items():
-                    if k in self.SENSITIVE_KEYS and isinstance(v, str):
-                        return True
-                    if _check(v):
-                        return True
-            elif isinstance(obj, list):
-                for item in obj:
-                    if _check(item):
-                        return True
+    def matchtask(self, file, task):
+        """
+        Trigger if the task contains a 'password' key with a literal value
+        """
+        if not isinstance(task, dict):
             return False
-
-        if _check(task):
+        password = task.get('password')
+        if password and isinstance(password, str) and not password.strip().startswith('{{'):
             return True
         return False
