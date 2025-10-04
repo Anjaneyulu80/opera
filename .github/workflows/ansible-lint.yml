@@ -39,12 +39,18 @@ jobs:
           ls -l $HOME/.ansible-lint/rules/
           echo "Installed ansible-lint rules:"
           ansible-lint --list-rules | grep -i "Rule" || true
+          
+      # 6.Verify custom rule load
+      - name: Verify custom rule loads
+        run: |
+          echo "Listing rules..."
+          ansible-lint --list-rules | grep HC100 || (echo "❌ Custom rule not loaded!" && exit 1)
 
-      # 6. Verify playbook exists
+      # 7. Verify playbook exists
       - name: Verify playbook path
         run: ls -l $GITHUB_WORKSPACE/playbooks/test.yml
 
-      # 7. Run ansible-lint
+      # 8. Run ansible-lint
       - name: Run ansible-lint on playbook
         run: |
-          ansible-lint -r $HOME/.ansible-lint/rules/hardcoded_password.py $GITHUB_WORKSPACE/playbooks/test.yml
+          ansible-lint -r $HOME/.ansible-lint/rules/ $GITHUB_WORKSPACE/playbooks/test.yml
