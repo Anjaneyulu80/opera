@@ -1,18 +1,28 @@
-# playbooks/sample_hardcoded.yml
 ---
-- name: Sample playbook with hard-coded password
+- name: Test Playbook for Hardcoded Password Rule
   hosts: localhost
+  vars:
+    safe_password: "{{ vault_db_password }}"   # Should NOT trigger
+    unsafe_password: "supersecret123"         # Should trigger
 
   tasks:
-    - name: Create database user with hard-coded password
-      community.mysql.mysql_user:
-        name: "admin"
-        password: "P@ssw0rd123"  # Hard-coded password
-        priv: "mydb.*:ALL"
-        state: present
+    - name: Task with templated password
+      user:
+        name: "testuser"
+        password: "{{ vault_db_password }}"    # Should NOT trigger
 
-    - name: Create a file with a hard-coded password
-      ansible.builtin.copy:
-        dest: "/tmp/secret.txt"
-        content: "DB password is P@ssw0rd123"
-        mode: '0600'
+    - name: Task with hardcoded password
+      user:
+        name: "admin"
+        password: "mypassword123"              # Should trigger
+
+    - name: Task with vault reference
+      user:
+        name: "vaultuser"
+        password: "!vault | ..."               # Should NOT trigger
+
+    - name: Task with secret token
+      uri:
+        url: "https://example.com/api"
+        headers:
+          Authorization: "Bearer mysecrettoken" # Should trigger
