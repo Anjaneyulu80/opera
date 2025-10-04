@@ -6,33 +6,24 @@ class HardcodedPasswordRule(AnsibleLintRule):
     description = "Avoid hardcoding passwords anywhere in tasks"
     severity = "HIGH"
     tags = ["security"]
-    version_changed  = "25.9.1"
+    version_added = "25.9.1"
 
     SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
 
     def matchtask(self, task, file=None):
-        """
-        Check for hardcoded passwords and return line numbers for reporting
-        """
-        matches = []
-
-        # Recursively check the task
         def _check(obj):
             if isinstance(obj, dict):
                 for k, v in obj.items():
                     if k in self.SENSITIVE_KEYS and isinstance(v, str):
-                        matches.append(getattr(task, "__line__", None))
-                    _check(v)
+                        return True
+                    if _check(v):
+                        return True
             elif isinstance(obj, list):
                 for item in obj:
-                    _check(item)
+                    if _check(item):
+                        return True
+            return False
 
-        _check(task)
-
-        # Return a list of dictionaries with line numbers and messages
-        return [
-            {
-                "linenumber": linen or 0,  # fallback if line number not found
-                "message": f"[{self.id}] {self.shortdesc}"
-            } for linen in matches
-        ]
+        if _check(task):
+            return True
+        return False
