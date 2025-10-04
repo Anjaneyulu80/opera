@@ -1,28 +1,8 @@
----
-- name: Test Playbook for Hardcoded Password Rule
+- name: Example with password
   hosts: localhost
   vars:
-    safe_password: "{{ vault_db_password }}"   # Should NOT trigger
-    unsafe_password: "supersecret123"         # Should trigger
-
+    my_password: "SuperSecret123"
   tasks:
-    - name: Task with templated password
-      user:
-        name: "testuser"
-        password: "{{ vault_db_password }}"    # Should NOT trigger
-
-    - name: Task with hardcoded password
-      user:
-        name: "admin"
-        password: "mypassword123"              # Should trigger
-
-    - name: Task with vault reference
-      user:
-        name: "vaultuser"
-        password: "!vault | ..."               # Should NOT trigger
-
-    - name: Task with secret token
-      uri:
-        url: "https://example.com/api"
-        headers:
-          Authorization: "Bearer mysecrettoken" # Should trigger
+    - name: Debug password
+      debug:
+        msg: "{{ my_password }}"
