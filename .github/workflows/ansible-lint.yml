@@ -30,7 +30,7 @@ jobs:
       - name: Copy custom ansible-lint rules
         run: |
           mkdir -p $HOME/.ansible-lint/rules/
-          cp -v ansible-lint-rules/*.py $HOME/.ansible-lint/rules/ || echo "No custom rules found!"
+          cp -v rules/*.py $HOME/.ansible-lint/rules/ || echo "No custom rules found!"
 
       # 5. Verify that rules are available
       - name: Verify custom rules
