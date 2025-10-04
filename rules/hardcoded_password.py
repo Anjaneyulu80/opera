@@ -10,33 +10,21 @@ class HardCodedPasswordRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["security", "passwords", "badpractice"]
+    version_changed = "1.0.0"
 
-    # Keys to check for sensitive information
     common_password_keys = ["password", "passwd", "secret", "token"]
-
-    # Regex for detecting hardcoded values in YAML/variables
     regex = re.compile(r'(?i)\b(password|passwd|secret|token)\b\s*[:=]\s*["\'].*["\']')
 
     def matchtask(self, file, task):
-        """
-        Recursively check task arguments for hardcoded password-like fields.
-        Ignores templated variables and vault references.
-        """
         def check_dict(d):
             for k, v in d.items():
                 key_lower = k.lower()
                 if key_lower in self.common_password_keys and isinstance(v, str):
-                    # Skip templated variables and vault references
-                    if "{{" in v or "}}" in v:
-                        continue
-                    if "!vault" in v.lower():
+                    if "{{" in v or "}}" in v or "!vault" in v.lower():
                         continue
                     return True
-                # Check nested dictionaries
-                if isinstance(v, dict):
-                    if check_dict(v):
-                        return True
-                # Check lists of dictionaries (loops, etc.)
+                if isinstance(v, dict) and check_dict(v):
+                    return True
                 if isinstance(v, list):
                     for item in v:
                         if isinstance(item, dict) and check_dict(item):
@@ -45,20 +33,17 @@ class HardCodedPasswordRule(AnsibleLintRule):
 
         return check_dict(task)
 
-    def matchlines(self, file, text):
+    def matchlines(self, file, text=None):
         """
-        Scan raw text lines for hardcoded passwords.
-        Ignores templated variables and vault references.
-        Returns list of (lineno, line) tuples.
+        file: Lintable object
+        text: optional string content (None = use file.contents)
         """
+        if text is None:
+            text = file.contents
         results = []
         for lineno, line in enumerate(text.splitlines(), start=1):
-            match = self.regex.search(line)
-            if match:
-                # Skip templated or vault-protected lines
-                if "{{" in line or "}}" in line:
-                    continue
-                if "!vault" in line.lower():
+            if self.regex.search(line):
+                if "{{" in line or "}}" in line or "!vault" in line.lower():
                     continue
                 results.append((lineno, line.strip()))
         return results
