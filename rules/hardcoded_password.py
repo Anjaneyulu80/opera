@@ -7,7 +7,7 @@ class HardCodedPasswordRule(AnsibleLintRule):
     description = 'Passwords or secrets should not be hardcoded in playbooks'
     severity = 'HIGH'
     tags = ['security']
-    version_added = '1.0.0'
+    version_added = '7.0.0'
 
     SECRET_KEYS = ['password', 'passwd', 'pass', 'secret', 'api_key', 'token']
     PLACEHOLDERS = ('<tbd>', 'changeme', 'change-me', 'dummy', 'example', 'none')
