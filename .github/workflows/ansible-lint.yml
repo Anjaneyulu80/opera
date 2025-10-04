@@ -30,7 +30,4 @@ jobs:
       - name: Run ansible-lint
         env:
           ANSIBLE_LINT_RULES: /rules
-        run: ansible-lint -r $HOME/.ansible-lint/rules/ $GITHUB_WORKSPACE/playbooks/test.yml
-
-
-
+        run: ansible-lint -R $HOME/.ansible-lint/rules/ $GITHUB_WORKSPACE/playbooks/test.yml
