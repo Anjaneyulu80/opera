@@ -8,7 +8,7 @@ class HardcodedPasswordRule(AnsibleLintRule):
     tags = ["security"]
     version_added = "25.9.1"
 
-    SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
+    SENSITIVE_KEYS = ["password", "passwd", "secret", "token", "db_password"]
 
     def matchtask(self, task, file=None):
         def _check(obj):
