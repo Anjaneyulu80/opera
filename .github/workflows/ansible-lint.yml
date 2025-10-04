@@ -9,12 +9,18 @@ on:
 jobs:
   ansible-lint:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+
       - name: Install ansible-lint
-        run: pip install --upgrade ansible-lint
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-lint==24.*   # pin to major version for stability
 
       - name: Run ansible-lint
         run: ansible-lint playbooks/
