@@ -27,7 +27,5 @@ jobs:
       - name: Run ansible-lint 
         run: ansible-lint playbooks/
 
-
-
       - name: Run ansible-lint
-        run: ansible-lint playbooks/
+        run:  ansible-lint -p --rulesdir ./rules ./playbooks/test.yml
