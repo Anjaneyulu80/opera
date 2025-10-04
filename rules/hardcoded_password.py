@@ -1,4 +1,3 @@
-# ansible-lint-rules/hardcoded_password.py
 from ansiblelint.rules import AnsibleLintRule
 
 class HardcodedPasswordRule(AnsibleLintRule):
