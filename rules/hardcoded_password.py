@@ -6,6 +6,7 @@ class HardcodedPasswordRule(AnsibleLintRule):
     description = "Avoid hardcoding passwords anywhere in tasks"
     severity = "HIGH"
     tags = ["security"]
+    version_changed  = "25.9.1"
 
     SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
 
