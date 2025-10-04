@@ -2,16 +2,15 @@ name: Lint Ansible Playbooks
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - "main"
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - "main"
 
 jobs:
   ansible-lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ansible_lint_version: [ "6.0.0", "24.*" ]
 
     steps:
       - name: Checkout repository
@@ -22,10 +21,10 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Install ansible-lint ${{ matrix.ansible_lint_version }}
+      - name: Install ansible-lint 6.0.0
         run: |
           python -m pip install --upgrade pip
-          pip install ansible-lint==${{ matrix.ansible_lint_version }}
+          pip install ansible-lint==6.0.0
 
       - name: Run ansible-lint
         run: ansible-lint playbooks/
