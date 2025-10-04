@@ -1,22 +1,22 @@
-# playbooks/deploy_app.yml
-- name: Deploy example app (insecure: hardcoded passwords)
-  hosts: app_servers
+---
+- name: Sample playbook with hard-coded passwords
+  hosts: all
   become: yes
-  vars:
-    db_user: "app_user"
-    db_password: "Test123"   # <-- Hardcoded secret
-  tasks:
-    - name: Ensure app directory exists
-      file:
-        path: /opt/example_app
-        state: directory
-        owner: "{{ db_user }}"
-        mode: '0755'
 
-    - name: Create database user (example)
+  vars:
+    db_user: "admin"
+    db_password: "P@ssw0rd123"   # Hard-coded password (intentional)
+
+  tasks:
+    - name: Create database user with hard-coded password
       community.mysql.mysql_user:
         name: "{{ db_user }}"
         password: "{{ db_password }}"
-        priv: "example_db.*:ALL"
+        priv: "mydb.*:ALL"
         state: present
-      delegate_to: db.example.internal
+
+    - name: Create a file with a hard-coded password
+      copy:
+        dest: "/tmp/secret.txt"
+        content: "DB password is {{ db_password }}"
+        mode: '0600'
