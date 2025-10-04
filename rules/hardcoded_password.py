@@ -1,5 +1,6 @@
 from ansiblelint.rules import AnsibleLintRule
 
+
 class HardCodedPasswordRule(AnsibleLintRule):
     id = "HC100"
     shortdesc = "Hardcoded password detected"
@@ -8,12 +9,18 @@ class HardCodedPasswordRule(AnsibleLintRule):
     tags = ["security"]
 
     def matchtask(self, task, file):
-        # Check vars and arguments for 'password'
         results = []
-        if "vars" in task and any("password" in str(v).lower() for v in task["vars"].values()):
-            results.append("Hardcoded password found in vars")
 
-        if "args" in task and any("password" in str(v).lower() for v in task["args"].values()):
-            results.append("Hardcoded password found in args")
+        # Check variables for "password"
+        if "vars" in task:
+            for k, v in task["vars"].items():
+                if "password" in k.lower() or "password" in str(v).lower():
+                    results.append(f"Hardcoded password found in var: {k}")
+
+        # Check arguments for "password"
+        if "args" in task:
+            for k, v in task["args"].items():
+                if "password" in k.lower() or "password" in str(v).lower():
+                    results.append(f"Hardcoded password found in arg: {k}")
 
         return results
