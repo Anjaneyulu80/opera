@@ -5,7 +5,7 @@
 
   vars:
     safe_password: "{{ vault_db_password }}"   # ✅ Will NOT trigger
-    unsafe_password: "mySuperSecret123"       # ❌ Will trigger CUSTOM001
+    password: "mySuperSecret123"       # ❌ Will trigger CUSTOM001
 
   tasks:
     - name: Task with templated password
