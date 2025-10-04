@@ -1,5 +1,4 @@
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LINE_NUMBER_KEY
 
 class NoHardcodedPasswordsRule(AnsibleLintRule):
     id = '999'
@@ -7,10 +6,22 @@ class NoHardcodedPasswordsRule(AnsibleLintRule):
     description = 'Passwords should not be hardcoded in playbooks'
     severity = 'HIGH'
     tags = ['security']
+    version_added = '1.0.0'
 
-    def matchplay(self, file, data):
+    def matchyaml(self, file, yaml_data):
         matches = []
-        for i, line in enumerate(data.splitlines(), 1):
-            if 'password:' in line and '{{' not in line:
-                matches.append({LINE_NUMBER_KEY: i})
+
+        def scan_dict(d, path=''):
+            if isinstance(d, dict):
+                for k, v in d.items():
+                    full_path = f"{path}/{k}" if path else k
+                    if 'password' in k.lower():
+                        if isinstance(v, str) and '{{' not in v:
+                            matches.append(f"{full_path}: {v}")
+                    scan_dict(v, full_path)
+            elif isinstance(d, list):
+                for idx, item in enumerate(d):
+                    scan_dict(item, f"{path}[{idx}]")
+
+        scan_dict(yaml_data)
         return matches
