@@ -28,4 +28,6 @@ jobs:
         run: ansible-lint playbooks/
 
       - name: Run ansible-lint
-        run:  ansible-lint -p --rulesdir ./rules ./playbooks/test.yml
+        env:
+          ANSIBLE_LINT_RULES: ./rules
+        run: ansible-lint -p ./playbooks/test.yml
