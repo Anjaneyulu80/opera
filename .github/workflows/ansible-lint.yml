@@ -29,6 +29,6 @@ jobs:
 
       - name: Run ansible-lint
         env:
-          ANSIBLE_LINT_RULES: ./rules
-        run: ansible-lint -r ~/.ansible-lint/rules/hardcoded_password.yml
+          ANSIBLE_LINT_RULES: /rules
+        run: ansible-lint -r /.ansible-lint/rules/hardcoded_password.yml
 
