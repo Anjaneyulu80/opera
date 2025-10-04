@@ -16,7 +16,7 @@
     - name: Task with hardcoded password
       user:
         name: "admin"
-        password: "Admin123!"                  # ❌ Will trigger CUSTOM001
+        passwd: "Admin123!"                  # ❌ Will trigger CUSTOM001
 
     - name: Task with hardcoded secret token
       uri:
