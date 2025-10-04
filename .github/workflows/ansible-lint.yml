@@ -31,9 +31,15 @@ jobs:
         run: |
           echo "Listing playbook file:"
           ls -l $GITHUB_WORKSPACE/playbooks/test.yml
-
-      # 5. Run ansible-lint with custom rules
-      - name: Run ansible-lint
+          
+      - name: Prepare ansible-lint rules
         run: |
-          echo "Running ansible-lint..."
-          ansible-lint -R $HOME/.ansible-lint/rules/
+          mkdir -p $HOME/.ansible-lint/rules/
+          cp rules/*.py $HOME/.ansible-lint/rules/ 
+          
+      - name: List custom rules
+        run: ls -l $HOME/.ansible-lint/rules/
+
+      # 6. Run ansible-lint with custom rules
+      - name: Run ansible-lint
+        run: ansible-lint -r $HOME/.ansible-lint/rules/ $GITHUB_WORKSPACE/playbooks/test.yml
