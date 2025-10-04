@@ -46,11 +46,18 @@ jobs:
           echo "Listing rules..."
           ansible-lint --list-rules | grep CUSTOM001
 
-      # 7. Verify playbook exists
+      # 7. Listing rules
+      - name: List rules
+        run: |
+          echo "Listing rules..."
+          ansible-lint --list-rules -r .github/ansible-lint/rules | grep CUSTOM001
+
+
+      # 8. Verify playbook exists
       - name: Verify playbook path
         run: ls -l $GITHUB_WORKSPACE/playbooks/test.yml
 
-      # 8. Run ansible-lint
+      # 9. Run ansible-lint
       - name: Run ansible-lint on playbook
         run: |
-          ansible-lint -r $HOME/.ansible-lint/rules/ $GITHUB_WORKSPACE/playbooks/test.yml
+          ansible-lint -r .github/ansible-lint/rules/ $GITHUB_WORKSPACE/playbooks/test.yml
