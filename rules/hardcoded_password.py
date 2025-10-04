@@ -2,7 +2,7 @@ from ansiblelint.rules import AnsibleLintRule
 
 
 class HardCodedPasswordRule(AnsibleLintRule):
-    id = "HC100"
+    id = "CUSTOM001"
     shortdesc = "Hardcoded password detected"
     description = "Avoid hardcoding passwords directly in playbooks or tasks"
     severity = "HIGH"
