@@ -46,6 +46,7 @@ jobs:
 
       # 7. Run ansible-lint
       - name: Run ansible-lint on playbook
-        run: ansible-lint playbooks/test.yml
+        run: ansible-lint -r .github/ansible-lint/rules playbooks/test.yml
+
 
 
