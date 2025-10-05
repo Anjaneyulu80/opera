@@ -1,8 +1,8 @@
 ---
-- name: Create user with password
-  hosts: all
+- name: Define credentials
+  hosts: localhost
+  vars:
+    db_password: "SuperSecret!"  # <-- Hardcoded password
   tasks:
-    - name: Set user password (bad example)
-      user:
-        name: admin
-        password: "P@ssw0rd123"  # <-- Hardcoded password
+    - debug:
+        msg: "Connecting with password {{ db_password }}"
