@@ -1,8 +1,7 @@
-- name: Example playbook with hardcoded password
+- name: Test hardcoded password
   hosts: localhost
   vars:
-    db_password: mySecret123
-    api_key: "12345-ABCDE"
+    password: mySecret123
   tasks:
     - name: Dummy task
       debug:
