@@ -26,4 +26,4 @@ jobs:
 
       - name: Run ansible-lint with custom rules
         run: |
-          ansible-lint -v --rulesdir custom_rules ansible/playbook.yml
+          ansible-lint -r custom_rules ansible/playbook.yml
