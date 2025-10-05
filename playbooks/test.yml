@@ -1,30 +1,9 @@
----
-- name: Test playbook for hardcoded passwords
+- name: Example playbook with hardcoded password
   hosts: localhost
-  gather_facts: false
-
   vars:
-    safe_password: "{{ vault_db_password }}"   # ✅ Will NOT trigger
-    password: "mySuperSecret123"       # ❌ Will trigger CUSTOM001
-
+    db_password: mySecret123
+    api_key: "12345-ABCDE"
   tasks:
-    - name: Task with templated password
-      user:
-        name: "templated_user"
-        password: "{{ vault_db_password }}"    # ✅ Will NOT trigger
-
-    - name: Task with hardcoded password
-      user:
-        name: "admin"
-        passwd: "Admin123!"                  # ❌ Will trigger CUSTOM001
-
-    - name: Task with hardcoded secret token
-      uri:
-        url: "https://example.com/api"
-        headers:
-          Authorization: "Bearer mysecrettoken" # ❌ Will trigger CUSTOM001
-
-    - name: Task with vault reference
-      user:
-        name: "vault_user"
-        password: "!vault | ..."               # ✅ Will NOT trigger
+    - name: Dummy task
+      debug:
+        msg: "Hello World"
