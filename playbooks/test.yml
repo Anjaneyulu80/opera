@@ -1,6 +1,10 @@
 ---
-- name: Run command with password
+- name: Write config file
   hosts: all
   tasks:
-    - name: Use password in command
-      command: echo "password=admin123"  # <-- Hardcoded password
+    - name: Create database config
+      copy:
+        dest: /etc/app/db.conf
+        content: |
+          username=appuser
+          password=myDBpass123  # <-- Hardcoded password
