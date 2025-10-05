@@ -1,10 +1,8 @@
 ---
-- name: Write config file
+- name: Create user with password
   hosts: all
   tasks:
-    - name: Create database config
-      copy:
-        dest: /etc/app/db.conf
-        content: |
-          username=appuser
-          password=myDBpass123  # <-- Hardcoded password
+    - name: Set user password (bad example)
+      user:
+        name: admin
+        password: "P@ssw0rd123"  # <-- Hardcoded password
