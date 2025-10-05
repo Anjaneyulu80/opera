@@ -1,4 +1,4 @@
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint import AnsibleLintRule
 import math
 import re
 
