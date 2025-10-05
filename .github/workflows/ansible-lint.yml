@@ -44,6 +44,6 @@ jobs:
       - name: Verify playbook path
         run: ls -l $GITHUB_WORKSPACE/playbooks/test.yml
 
-      # 7. Run ansible-lint with custom rules
-	  - name: Run ansible-lint with custom rules
+      # 7. Run ansible-lint
+      - name: Run ansible-lint on playbook
         run: ansible-lint -r .github/ansible-lint/rules playbooks/
