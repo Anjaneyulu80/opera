@@ -1,3 +1,3 @@
 # .ansible-lint
 rulesdir:
-  - rules/rules
+  - rules
