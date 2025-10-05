@@ -1,8 +1,8 @@
 - name: Test Playbook for Hardcoded Secrets
   hosts: localhost
   vars:
-    db_password: mySecret123                 # should be detected
-    api_key: "12345-ABCDE"                   # should be detected
+    db_password: !{Secret123                 # should be detected
+    api_key: 2345-ABCDE"                   # should be detected
     encoded_secret: "QWERTYUIOPASDFGHJKLZXCVBNM=="  # should be detected
     safe_var: "{{ vault_db_password }}"      # should NOT be detected
     placeholder_password: "changeme"        # should NOT be detected
