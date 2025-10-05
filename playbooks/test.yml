@@ -1,10 +1,33 @@
 ---
-- name: Write config file
+- name: Test playbook for hardcoded passwords
   hosts: all
+  gather_facts: false
+
+  vars:
+    db_password: "SuperSecret123"          # <-- Hardcoded password
+    api_token: "token_abc12345"            # <-- Hardcoded API token (should also trigger)
+
   tasks:
-    - name: Create database config
+    - name: Create admin user
+      user:
+        name: admin
+        password: "P@ssw0rd!"              # <-- Hardcoded password
+
+    - name: Configure application
       copy:
-        dest: /etc/app/db.conf
+        dest: /etc/myapp/config.ini
         content: |
+          [database]
           username=appuser
-          password=myDBpass123  # <-- Hardcoded password
+          password=myDBpass123             # <-- Hardcoded password
+
+    - name: Run a command with password
+      command: echo "password=cliPass123"  # <-- Hardcoded password
+
+    - name: Set a fact with password
+      set_fact:
+        root_password: "root123"           # <-- Hardcoded password
+
+    - name: Display credentials
+      debug:
+        msg: "Using password {{ db_password }}"  # <-- Reference to hardcoded var
