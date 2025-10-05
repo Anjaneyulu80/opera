@@ -1,7 +1,7 @@
 - name: Test hardcoded password
   hosts: localhost
   vars:
-    password: mySecret123
+    db_password: mySecret123
   tasks:
     - name: Dummy task
       debug:
