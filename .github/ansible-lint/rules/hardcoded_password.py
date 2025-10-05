@@ -8,7 +8,7 @@ class HardcodedSecretsRule(AnsibleLintRule):
     description = 'Detects hardcoded passwords, tokens, API keys, and high-entropy strings in YAML files.'
     severity = 'HIGH'
     tags = ['security']
-    version_added = '6.5.0'
+    version_added = '7.5.0'
 
     # Keys that usually contain secrets
     SECRET_KEYS = ['password', 'passwd', 'secret', 'token', 'api_key', 'access_key', 'secret_key', 'client_secret']
