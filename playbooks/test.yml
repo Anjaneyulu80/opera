@@ -1,8 +1,14 @@
-- name: Test hardcoded password
+- name: Test Playbook for Hardcoded Secrets
   hosts: localhost
   vars:
-    db_password: mySecret123
+    db_password: mySecret123                 # should be detected
+    api_key: "12345-ABCDE"                   # should be detected
+    encoded_secret: "QWERTYUIOPASDFGHJKLZXCVBNM=="  # should be detected
+    safe_var: "{{ vault_db_password }}"      # should NOT be detected
+    placeholder_password: "changeme"        # should NOT be detected
   tasks:
     - name: Dummy task
       debug:
         msg: "Hello World"
+    - name: Another task with inline password
+      shell: echo "db password is mySecret456"  # won't be detected; only vars are scanned
