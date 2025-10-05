@@ -1,12 +1,15 @@
-name: Ansible Lint (with Custom Rules)
+name: Ansible Lint
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
-  lint:
+  ansible-lint:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -14,13 +17,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
-      - name: Install ansible-lint
+      - name: Install Ansible and ansible-lint
         run: |
           python -m pip install --upgrade pip
           pip install ansible ansible-lint
 
       - name: Run ansible-lint with custom rules
         run: |
-          ansible-lint -r .github/ansible-lint/rules playbooks/
+          ansible-lint -v --rulesdir custom_rules ansible/playbook.yml
