@@ -1,4 +1,4 @@
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint import AnsibleLintRule
 
 class HardcodedPasswordRule(AnsibleLintRule):
     id = "CUSTOM001"  # ← your rule ID
