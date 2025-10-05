@@ -1,12 +1,17 @@
 ---
-- name: Example playbook for hardcoded password
-  hosts: all
+# playbook.yml
+# Example Ansible playbook for testing ansible-lint custom rule
+
+- hosts: all
+  # name: "Example Playbook"   # Uncomment this line to satisfy the custom rule
   gather_facts: false
-  vars:
-    db_password: SuperSecret123
 
   tasks:
-    - name: Create admin user
-      user:
-        name: admin
-        password: P@ssw0rd!
+    - name: Ensure /tmp/testfile exists
+      file:
+        path: /tmp/testfile
+        state: touch
+
+    - name: Print a message
+      debug:
+        msg: "Hello, Ansible Lint!"
