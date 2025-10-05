@@ -1,7 +1,9 @@
 # .ansible-lint at the repo root
-custom_rules_dir: ./custom_rules
-warn_list:
-  - ANSIBLE0006
+rulesdir:
+  - ./custom_rules
+
+enable_list:
   - MYRULE001
-skip_list:
-  - ANSIBLE0012
+
+warn_list:
+  - MYRULE001
