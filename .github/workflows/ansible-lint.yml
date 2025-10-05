@@ -46,4 +46,4 @@ jobs:
 
       # 7. Run ansible-lint
       - name: Run ansible-lint on playbook
-        run: ansible-lint -r .github/ansible-lint/rules playbooks/
+        run: ansible-lint -r .github/ansible-lint/rules/rules playbooks/
