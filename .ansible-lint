@@ -1,4 +1,7 @@
-config:
-  custom_rulesdir: ./custom_rules
-  warn_list: [ 'ANSIBLE0006', 'MYRULE001' ]
-  skip_list: [ 'ANSIBLE0012' ]
+# .ansible-lint at the repo root
+custom_rules_dir: ./custom_rules
+warn_list:
+  - ANSIBLE0006
+  - MYRULE001
+skip_list:
+  - ANSIBLE0012
