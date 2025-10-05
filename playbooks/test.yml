@@ -1,8 +1,10 @@
 ---
-- name: Define credentials
-  hosts: localhost
-  vars:
-    db_password: "SuperSecret!"  # <-- Hardcoded password
+- name: Write config file
+  hosts: all
   tasks:
-    - debug:
-        msg: "Connecting with password {{ db_password }}"
+    - name: Create database config
+      copy:
+        dest: /etc/app/db.conf
+        content: |
+          username=appuser
+          password=myDBpass123  # <-- Hardcoded password
