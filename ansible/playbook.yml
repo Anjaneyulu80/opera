@@ -1,0 +1,12 @@
+---
+- name: Example playbook for hardcoded password
+  hosts: all
+  gather_facts: false
+  vars:
+    db_password: SuperSecret123
+
+  tasks:
+    - name: Create admin user
+      user:
+        name: admin
+        password: P@ssw0rd!
