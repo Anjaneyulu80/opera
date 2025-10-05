@@ -19,7 +19,7 @@ class HardcodedSecretsRule(AnsibleLintRule):
             if isinstance(data, dict):
                 for key, value in data.items():
                     key_lower = str(key).lower()
-                    if any(word in key_lower for word in ["password", "secret", "token", "api_key"]):
+                    if any(word in key_lower for word in ["password", "secret", "root_password", "token", "api_key"]):
                         if isinstance(value, str) and value.strip():
                             results.append((path or key, f"{key}: {value}"))
                     scan_data(value, f"{path}.{key}" if path else key)
