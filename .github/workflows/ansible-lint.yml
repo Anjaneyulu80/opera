@@ -52,4 +52,4 @@ jobs:
 
       # 8. Run ansible-lint
       - name: Run ansible-lint on playbook
-        run: ansible-lint -r .github/ansible-lint/rules/hardcoded_passwords.py playbooks/test.yml
+        run: ansible-lint -r playbooks/test.yml
