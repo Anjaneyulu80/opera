@@ -6,7 +6,7 @@ class HardcodedPasswordRule(AnsibleLintRule):
     description = 'Detects hardcoded passwords in YAML files.'
     severity = 'HIGH'
     tags = ['security']
-    version_added = '1.0.0'
+    version_added = '8.0.0'
 
     def matchyaml(self, file, yaml_data):
         matches = []
