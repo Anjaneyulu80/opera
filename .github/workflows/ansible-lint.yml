@@ -1,52 +1,36 @@
-name: Ansible Lint CI
+# .github/workflows/ansible-lint.yml
+name: Ansible Lint
 
 on:
   push:
-    branches: [main]
+    paths:
+      - 'playbooks/**'
+      - '.github/ansible-lint/rules/**'
   pull_request:
+    paths:
+      - 'playbooks/**'
+      - '.github/ansible-lint/rules/**'
 
 jobs:
-  lint-playbook:
+  lint:
+    name: Run ansible-lint
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checkout the repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      # 3. Install Ansible and ansible-lint
-      - name: Install Ansible and ansible-lint
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ansible ansible-lint
+          pip install ansible ansible-lint yamllint
 
-      # 4. Copy custom rules into $HOME/.ansible-lint/rules/
-      - name: Copy custom ansible-lint rules
-        run: |
-          mkdir -p $HOME/.ansible-lint/rules/
-          cp -v rules/*.py $HOME/.ansible-lint/rules/ || echo "No custom rules found!"
+      - name: Validate YAML syntax
+        run: yamllint playbooks/
 
-      # 5. Verify that rules are available
-      - name: Verify custom rules
-        run: |
-          echo "Listing custom rules:"
-          ls -l $HOME/.ansible-lint/rules/
-          echo "Installed ansible-lint rules:"
-          ansible-lint --list-rules | grep -i "Rule" || true
-
-      # 6. Verify playbook exists
-      - name: Verify playbook path
-        run: ls -l $GITHUB_WORKSPACE/playbooks/test.yml
-
-      # 7. Run ansible-lint
-      - name: Run ansible-lint on playbook
-        run: ansible-lint -r .github/ansible-lint/rules playbooks/test.yml
-
-
-
+      - name: Run ansible-lint with custom rules
+        run: ansible-lint -r .github/ansible-lint/rules playbooks/
