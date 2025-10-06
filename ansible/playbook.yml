@@ -9,4 +9,4 @@
     - name: Create user
       user:
         name: admin
-        password: "hardcoded!"
+        password: hardcoded!
