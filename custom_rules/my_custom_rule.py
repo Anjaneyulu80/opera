@@ -1,20 +1,36 @@
+import re
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint.utils import LintMatch
 
-class MyCustomRule(AnsibleLintRule):
-    id = "MYRULE001"
-    shortdesc = "Ensure playbook has a top-level name"
-    description = "Every playbook should have a 'name' field for clarity."
-    severity = "MEDIUM"
-    tags = ["formatting"]
 
-    def matchplay(self, file, play):
-        if "name" not in play:
-            return [
-                LintMatch(
-                    path=file.path,            # file path
-                    lineno=play.get("__line__", 0),  # optional line number
-                    message="Playbook missing a top-level 'name' field"
-                )
-            ]
-        return []
+class HardcodedPasswordRule(AnsibleLintRule):
+    id = "CUSTOM001"
+    shortdesc = "Hardcoded password detected"
+    description = (
+        "Detects hardcoded passwords, tokens, or secrets in Ansible playbooks."
+    )
+    severity = "HIGH"
+    tags = ["security"]
+    version_added = "1.0.0"
+    version_changed = "1.0.0"
+
+    def matchyaml(self, file, yaml_data):
+        """
+        Parse structured YAML and detect hardcoded secrets.
+        """
+        results = []
+
+        def scan(data, path=""):
+            if isinstance(data, dict):
+                for key, value in data.items():
+                    key_lower = str(key).lower()
+                    if any(x in key_lower for x in ["password", "secret", "token", "api_key"]):
+                        if isinstance(value, str) and value.strip():
+                            # Each match includes line info and message
+                            results.append((path or key, f"{key}: {value}"))
+                    scan(value, f"{path}.{key}" if path else key)
+            elif isinstance(data, list):
+                for i, item in enumerate(data):
+                    scan(item, f"{path}[{i}]")
+
+        scan(yaml_data)
+        return results
