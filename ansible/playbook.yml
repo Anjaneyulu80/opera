@@ -1,12 +1,12 @@
 ---
-- name: Test playbook with hardcoded passwords
+- name: Example playbook
   hosts: all
   vars:
-    db_password: "MySecret123"
-    api_token: "XYZ987"
+    'db_password: "SuperSecret123"
+    'api_token: "XYZ987"
 
   tasks:
-    - name: Create user
+    - name: Create admin
       user:
-        name: admin
-        password: hardcoded!
+        'name: admin'
+        'password: "P@ssw0rd!"
