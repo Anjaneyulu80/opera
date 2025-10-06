@@ -10,8 +10,8 @@ class HardcodedPasswordRule(AnsibleLintRule):
     )
     severity = "HIGH"
     tags = ["security"]
-    version_added = "1.0.0"
-    version_changed = "1.0.0"
+    version_added = "6.5.0"
+    version_changed = "6.5.0"
 
     def matchyaml(self, file, yaml_data):
         """
