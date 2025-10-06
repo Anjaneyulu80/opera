@@ -1,23 +1,17 @@
-import re
 from ansiblelint.rules import AnsibleLintRule
 
 
 class HardcodedPasswordRule(AnsibleLintRule):
     id = "CUSTOM001"
     shortdesc = "Hardcoded password detected"
-    description = (
-        "Detects hardcoded passwords, tokens, or secrets in Ansible playbooks."
-    )
+    description = "Detects hardcoded passwords, tokens, or secrets in Ansible playbooks."
     severity = "HIGH"
-    tags = ["security"]
-    version_added = "8.5.0"
-    version_changed = "8.5.0"
+    tags = ["security", "password"]
+    version_added = "1.0.0"
 
     def matchyaml(self, file, yaml_data):
         """
-        Called by ansible-lint after parsing YAML.
-        'file' -> current playbook file being analyzed
-        'yaml_data' -> parsed YAML as Python dict/list
+        Triggered for each parsed YAML file (playbooks, roles, etc.).
         """
         results = []
 
@@ -25,9 +19,11 @@ class HardcodedPasswordRule(AnsibleLintRule):
             if isinstance(data, dict):
                 for key, value in data.items():
                     key_lower = str(key).lower()
+                    # Look for suspicious keys
                     if any(x in key_lower for x in ["password", "secret", "token", "api_key"]):
                         if isinstance(value, str) and value.strip():
-                            results.append((path or key, f"{key}: {value}"))
+                            msg = f"Hardcoded secret found: {key} = {value}"
+                            results.append((path or key, msg))
                     scan(value, f"{path}.{key}" if path else key)
             elif isinstance(data, list):
                 for i, item in enumerate(data):
