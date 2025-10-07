@@ -1,12 +1,30 @@
 ---
-- name: Example playbook
+- name: Test playbook for hardcoded password detection
   hosts: all
+  gather_facts: false
+
   vars:
-    'db_password: "SuperSecret123"
-    'api_token: "XYZ987"
+    db_password: "MyDBpass123"
+    api_token: "ABCD-1234-XYZ"
+    secret_key: "hardcodedsecret"
+    aws_access_key: "AKIAFAKEACCESSKEY"
+    aws_secret_key: "FAKESECRETKEY987"
+    encryption_key: "SuperSecretEncryptionKey"
 
   tasks:
-    - name: Create admin
+    - name: Create admin user with hardcoded password
       user:
-        'name: admin'
-        'password: "P@ssw0rd!"
+        name: admin
+        password: "P@ssw0rd!"
+
+    - name: Set an application config file with secret inline
+      lineinfile:
+        path: /tmp/app.conf
+        line: "password=SuperSecretValue"
+
+    - name: Echo sensitive data (bad practice)
+      shell: echo "token=abcd1234"
+
+    - name: Debug message containing secret
+      debug:
+        msg: "Connecting with API key: XYZ-FAKE-KEY"
