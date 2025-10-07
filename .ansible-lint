@@ -1,6 +1,1 @@
-# Skip irrelevant built-in rules
-skip_list:
-  - fqcn
-  - truthy
-  - risky-file-permissions
-
+{}
