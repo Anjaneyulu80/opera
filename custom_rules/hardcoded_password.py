@@ -1,7 +1,7 @@
 from ansiblelint.rules import AnsibleLintRule, Match
 
 class HardcodedPasswordRule(AnsibleLintRule):
-    id = "HC100"
+    id = "HARD123"
     shortdesc = "Avoid hard-coded passwords"
     description = "Detects hard-coded passwords in module parameters, inline content, and loops."
     severity = "HIGH"
