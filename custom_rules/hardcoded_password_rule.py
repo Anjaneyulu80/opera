@@ -25,7 +25,6 @@ class HardcodedPasswordRule(AnsibleLintRule):
                     if any(word in key_lower for word in ["password", "secret", "token", "api_key", "key"]):
                         if isinstance(value, str) and value.strip() and not value.strip().startswith("$ANSIBLE_VAULT"):
                             msg = f"Hardcoded secret found: {key} = {value}"
-                            # Use LintMatch here
                             results.append(LintMatch(file.path, msg))
                     scan(value, f"{path}.{key}" if path else key)
             elif isinstance(node, list):
