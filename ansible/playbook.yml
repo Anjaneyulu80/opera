@@ -1,17 +1,6 @@
----
-- name: Sample playbook with hard-coded password
+- name: Test playbook
   hosts: localhost
-  gather_facts: false
-
   tasks:
-    - name: Create user with hard-coded password
-      ansible.builtin.user:
-        name: "admin"
-        password: "P@ssw0rd123"
-        state: present
-
-    - name: Create a file with a hard-coded password
-      ansible.builtin.copy:
-        dest: "/tmp/secret.txt"
-        content: "DB password is P@ssw0rd123"
-        mode: '0600'
+    - name: Set password
+      debug:
+        msg: "password: 'MySecret123'"
