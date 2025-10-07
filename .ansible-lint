@@ -1,1 +1,13 @@
-{}
+# ansible-lint.yml
+rulesdirs:
+  - ./custom_rules
+
+files:
+  - ansible/playbook.yml
+
+# Skip irrelevant built-in rules
+skip_list:
+  - fqcn
+  - truthy
+  - risky-file-permissions
+
