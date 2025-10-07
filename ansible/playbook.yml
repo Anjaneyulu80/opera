@@ -1,31 +1,42 @@
 ---
-- name: Test Playbook for Hard-Coded Passwords
+- name: Complex Playbook for Testing HC100 Rule
   hosts: localhost
   gather_facts: false
 
   tasks:
-    - name: MySQL user with hard-coded password
+
+    - name: MySQL users with hard-coded passwords (loop)
       community.mysql.mysql_user:
-        name: admin
-        password: "P@ssw0rd123"
+        name: "{{ item.name }}"
+        password: "{{ item.password }}"
         priv: "mydb.*:ALL"
         state: present
+      loop:
+        - { name: 'admin', password: 'Admin123!' }
+        - { name: 'report', password: 'Report456!' }
 
-    - name: PostgreSQL user with hard-coded password
-      community.postgresql.postgresql_user:
-        name: pgadmin
-        password: "pgP@ss456"
-        role_attr_flags: LOGIN
-        state: present
+    - name: PostgreSQL users inside a block
+      block:
+        - name: Create superuser
+          community.postgresql.postgresql_user:
+            name: superadmin
+            password: "SuperSecret!"
+            role_attr_flags: LOGIN
+            state: present
+
+        - name: Create readonly user
+          community.postgresql.postgresql_user:
+            name: readonly
+            password: "ReadOnly123"
+            role_attr_flags: LOGIN
+            state: present
 
     - name: Create a file with hard-coded password
       ansible.builtin.copy:
         dest: "/tmp/secret.txt"
-        content: "DB password is mySecret123"
+        content: "DB password is MySecret123"
         mode: '0600'
 
-    - name: Inline content without password variable
-      ansible.builtin.copy:
-        dest: "/tmp/okfile.txt"
-        content: "No passwords here"
-        mode: '0600'
+    - name: Inline password in a variable
+      set_fact:
+        db_password: "InlineSecret!"
