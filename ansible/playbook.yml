@@ -1,18 +1,31 @@
 ---
-- name: Sample playbook with hard-coded passwords
+- name: Test Playbook for Hard-Coded Passwords
   hosts: localhost
   gather_facts: false
 
   tasks:
-    - name: Create MySQL user with hard-coded password
+    - name: MySQL user with hard-coded password
       community.mysql.mysql_user:
-        name: "admin"
+        name: admin
         password: "P@ssw0rd123"
         priv: "mydb.*:ALL"
         state: present
 
-    - name: Create a file with a hard-coded password
+    - name: PostgreSQL user with hard-coded password
+      community.postgresql.postgresql_user:
+        name: pgadmin
+        password: "pgP@ss456"
+        role_attr_flags: LOGIN
+        state: present
+
+    - name: Create a file with hard-coded password
       ansible.builtin.copy:
         dest: "/tmp/secret.txt"
-        content: "DB password is P@ssw0rd123"
+        content: "DB password is mySecret123"
+        mode: '0600'
+
+    - name: Inline content without password variable
+      ansible.builtin.copy:
+        dest: "/tmp/okfile.txt"
+        content: "No passwords here"
         mode: '0600'
