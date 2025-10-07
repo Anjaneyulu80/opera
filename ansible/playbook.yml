@@ -1,10 +1,5 @@
-- name: Test hardcoded password detection
-  hosts: localhost
-  vars:
-    db_password: "SuperSecret123"
-    api_token: "XYZ987"
-  tasks:
-    - name: Create admin
-      user:
-        name: admin
-        password: "P@ssw0rd!"
+- name: Create user with password
+  ansible.builtin.user:
+    name: "admin"
+    password: "P@ssw0rd123"
+    state: present
