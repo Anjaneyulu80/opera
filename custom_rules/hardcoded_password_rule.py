@@ -1,34 +1,50 @@
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, Match
+
 
 class HardcodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM001"
-    shortdesc = "Hardcoded password or secret detected"
-    description = (
-        "Detects hardcoded passwords, tokens, or secrets in Ansible playbooks."
-    )
+    id = "HC100"
+    shortdesc = "Avoid hard-coded passwords"
+    description = "Passwords should not be hard-coded in playbooks"
     severity = "HIGH"
-    tags = ["security", "password", "secret"]
-    version_added = "25.9.1"
-    version_changed = "25.9.1"
+    tags = ["security", "password"]
 
-    def matchyaml(self, file):
-        results = []
-        yaml_data = getattr(file, "data", None)
-        if not yaml_data:
-            return results
+    def matchtask(self, file, task):
+        """
+        Return a list of Match objects if hard-coded passwords are found.
+        """
+        matches = []
 
-        def scan(node, path=""):
-            if isinstance(node, dict):
-                for key, value in node.items():
-                    key_lower = str(key).lower()
-                    if any(word in key_lower for word in ["password", "secret", "token", "api_key", "key"]):
-                        if isinstance(value, str) and value.strip() and not value.strip().startswith("$ANSIBLE_VAULT"):
-                            msg = f"Hardcoded secret found: {key} = {value}"
-                            results.append((file.path, msg))
-                    scan(value, f"{path}.{key}" if path else key)
-            elif isinstance(node, list):
-                for i, item in enumerate(node):
-                    scan(item, f"{path}[{i}]")
+        if not isinstance(task, dict):
+            return matches
 
-        scan(yaml_data)
-        return results
+        skip_keys = ["name", "tags", "register", "delegate_to", "become", "when"]
+
+        for key, value in task.items():
+            if key in skip_keys:
+                continue
+
+            # Check module arguments for password field
+            if isinstance(value, dict):
+                pwd = value.get("password")
+                if pwd and isinstance(pwd, str) and not pwd.strip().startswith("{{"):
+                    matches.append(
+                        Match(
+                            lineno=0,
+                            filename=file["path"],
+                            rule=self,
+                            message=f"Hard-coded password found in task '{task.get('name', '')}'",
+                        )
+                    )
+
+            # Handle direct password field (rare)
+            if key == "password" and isinstance(value, str) and not value.strip().startswith("{{"):
+                matches.append(
+                    Match(
+                        lineno=0,
+                        filename=file["path"],
+                        rule=self,
+                        message=f"Hard-coded password found in task '{task.get('name', '')}'",
+                    )
+                )
+
+        return matches
