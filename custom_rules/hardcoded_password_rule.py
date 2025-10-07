@@ -1,7 +1,7 @@
 import re
-from ansiblelint.rules import Rule
+from ansiblelint.rules import AnsibleLintRule
 
-class HardcodedPasswordRule(Rule):
+class HardcodedPasswordRule(AnsibleLintRule):
     id = "HardcodedPasswords"
     shortdesc = "Hardcoded password or secret detected"
     description = (
@@ -10,6 +10,7 @@ class HardcodedPasswordRule(Rule):
     severity = "HIGH"
     tags = ["security", "password", "secret"]
     version_changed = "25.9.1"
+    version_added = "25.9.1"
 
     def matchyaml(self, file, yaml_data):
         """
