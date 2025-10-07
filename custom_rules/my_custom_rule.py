@@ -1,34 +1,42 @@
-from ansiblelint.rules import AnsibleLintRule
+import re
+from ansiblelint.rules import Rule
 
-
-class HardcodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM001"
-    shortdesc = "Hardcoded password detected"
-    description = "Detects hardcoded passwords, tokens, or secrets in Ansible playbooks."
+class HardcodedPasswordRule(Rule):
+    id = "HardcodedPasswords"
+    shortdesc = "Hardcoded password or secret detected"
+    description = (
+        "Detects hardcoded passwords, tokens, API keys or secrets in Ansible playbooks."
+    )
     severity = "HIGH"
-    tags = ["security", "password"]
+    tags = ["security", "password", "secret"]
     version_added = "25.9.1"
-    version_changed  = "25.9.1"
+	version_changed  = "25.9.1"
 
     def matchyaml(self, file, yaml_data):
         """
-        Triggered for each parsed YAML file (playbooks, roles, etc.).
+        Called by ansible-lint after YAML parsing.
+        `file` is a Lintable object, yaml_data is the parsed structure (dict or list).
+        Return a list of (path, message) tuples.
         """
         results = []
 
-        def scan(data, path=""):
-            if isinstance(data, dict):
-                for key, value in data.items():
-                    key_lower = str(key).lower()
-                    # Look for suspicious keys
-                    if any(x in key_lower for x in ["password", "secret", "token", "api_key"]):
-                        if isinstance(value, str) and value.strip():
-                            msg = f"Hardcoded secret found: {key} = {value}"
+        def scan(node, path=""):
+            if isinstance(node, dict):
+                for key, val in node.items():
+                    key_str = str(key).lower()
+
+                    # If the key’s name suggests it may store a secret
+                    if any(word in key_str for word in ["password", "secret", "token", "api_key"]):
+                        if isinstance(val, str) and val.strip():
+                            msg = f"Hardcoded secret found: {key} = {val}"
                             results.append((path or key, msg))
-                    scan(value, f"{path}.{key}" if path else key)
-            elif isinstance(data, list):
-                for i, item in enumerate(data):
-                    scan(item, f"{path}[{i}]")
+
+                    # Recurse
+                    scan(val, f"{path}.{key}" if path else key)
+
+            elif isinstance(node, list):
+                for idx, item in enumerate(node):
+                    scan(item, f"{path}[{idx}]")
 
         scan(yaml_data)
         return results
