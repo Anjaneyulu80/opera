@@ -1,5 +1,4 @@
 from ansiblelint.rules import AnsibleLintRule
-from ansiblelint import LintMatch
 
 class HardcodedPasswordRule(AnsibleLintRule):
     id = "CUSTOM001"
@@ -25,7 +24,7 @@ class HardcodedPasswordRule(AnsibleLintRule):
                     if any(word in key_lower for word in ["password", "secret", "token", "api_key", "key"]):
                         if isinstance(value, str) and value.strip() and not value.strip().startswith("$ANSIBLE_VAULT"):
                             msg = f"Hardcoded secret found: {key} = {value}"
-                            results.append(LintMatch(file.path, msg))
+                            results.append((file.path, msg))
                     scan(value, f"{path}.{key}" if path else key)
             elif isinstance(node, list):
                 for i, item in enumerate(node):
