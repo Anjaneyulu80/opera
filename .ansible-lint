@@ -1,6 +1,4 @@
 # ansible-lint.yml
 rulesdirs:
   - ./custom_rules
-files:
-  - ansible/playbook.yml
 
