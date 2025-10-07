@@ -1,50 +1,25 @@
-from ansiblelint.rules import AnsibleLintRule, Match
+from ansiblelint.rules import AnsibleLintRule
+import re
 
-
-class HardcodedPasswordRule(AnsibleLintRule):
-    id = "HC100"
-    shortdesc = "Avoid hard-coded passwords"
-    description = "Passwords should not be hard-coded in playbooks"
+class HardCodedPasswordRule(AnsibleLintRule):
+    id = "CUSTOM001"
+    shortdesc = "Hardcoded password detected"
+    description = "Avoid hardcoding passwords in playbooks, tasks, or roles."
     severity = "HIGH"
-    tags = ["security", "password"]
+    tags = ["security", "passwords"]
+    version_changed = "25.9.1"
 
-    def matchtask(self, file, task):
+    # Regex to catch passwords or simple Jinja2 templates
+    regex = re.compile(r'password\s*[:=]\s*(["\'].*?["\']|\{\{.*?\}\})', re.IGNORECASE)
+
+    def matchlines(self, file, text):
         """
-        Return a list of Match objects if hard-coded passwords are found.
+        Check each line for hardcoded passwords and return list of (line_number, line_text).
+        This ensures ansible-lint outputs:
+        filename:line_number: [ID] shortdesc
         """
         matches = []
-
-        if not isinstance(task, dict):
-            return matches
-
-        skip_keys = ["name", "tags", "register", "delegate_to", "become", "when"]
-
-        for key, value in task.items():
-            if key in skip_keys:
-                continue
-
-            # Check module arguments for password field
-            if isinstance(value, dict):
-                pwd = value.get("password")
-                if pwd and isinstance(pwd, str) and not pwd.strip().startswith("{{"):
-                    matches.append(
-                        Match(
-                            lineno=0,
-                            filename=file["path"],
-                            rule=self,
-                            message=f"Hard-coded password found in task '{task.get('name', '')}'",
-                        )
-                    )
-
-            # Handle direct password field (rare)
-            if key == "password" and isinstance(value, str) and not value.strip().startswith("{{"):
-                matches.append(
-                    Match(
-                        lineno=0,
-                        filename=file["path"],
-                        rule=self,
-                        message=f"Hard-coded password found in task '{task.get('name', '')}'",
-                    )
-                )
-
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            if self.regex.search(line):
+                matches.append((lineno, line.strip()))
         return matches
