@@ -1,5 +1,18 @@
-- name: Create user with hard-coded password
-  ansible.builtin.user:
-    name: admin
-    password: "P@ssw0rd123"
-    state: present
+---
+- name: Sample playbook with hard-coded password
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Create database user with hard-coded password
+      community.mysql.mysql_user:
+        name: "admin"
+        password: "P@ssw0rd123"
+        priv: "mydb.*:ALL"
+        state: present
+
+    - name: Create a file with a hard-coded password
+      ansible.builtin.copy:
+        dest: "/tmp/secret.txt"
+        content: "DB password is P@ssw0rd123"
+        mode: '0600'
