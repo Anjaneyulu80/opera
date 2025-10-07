@@ -26,6 +26,6 @@ jobs:
 
       - name: Run ansible-lint with custom rules
         env:
-          ANSIBLE_LINT_RULES: ./custom_rules
+          ANSIBLE_LINT_RULES: ./custom_rules   # 👈 Load custom rules via env variable
         run: |
-          ansible-lint -r custom_rules/ ansible/playbook.yml
+          ansible-lint ansible/playbook.yml
