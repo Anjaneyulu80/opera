@@ -1,15 +1,18 @@
-- name: Test hard-coded password detection
+---
+- name: Sample playbook with hard-coded passwords
   hosts: localhost
   gather_facts: false
 
   tasks:
-    - name: MySQL user with hard-coded password
+    - name: Create MySQL user with hard-coded password
       community.mysql.mysql_user:
-        name: admin
+        name: "admin"
         password: "P@ssw0rd123"
+        priv: "mydb.*:ALL"
         state: present
 
-    - name: File with hard-coded password
+    - name: Create a file with a hard-coded password
       ansible.builtin.copy:
-        dest: /tmp/secret.txt
+        dest: "/tmp/secret.txt"
         content: "DB password is P@ssw0rd123"
+        mode: '0600'
