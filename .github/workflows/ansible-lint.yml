@@ -25,5 +25,7 @@ jobs:
           pip install ansible ansible-lint
 
       - name: Run ansible-lint with custom rules
+        env:
+          ANSIBLE_LINT_RULES: ./custom_rules   # 👈 Load custom rules via env variable
         run: |
           ansible-lint ansible/playbook.yml
