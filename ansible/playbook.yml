@@ -1,6 +1,5 @@
-- name: Test playbook
-  hosts: localhost
-  tasks:
-    - name: Set password
-      debug:
-        msg: "password: 'MySecret123'"
+- name: Create user with hard-coded password
+  ansible.builtin.user:
+    name: admin
+    password: "P@ssw0rd123"
+    state: present
