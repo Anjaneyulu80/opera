@@ -28,4 +28,4 @@ jobs:
         env:
           ANSIBLE_LINT_RULES: ./custom_rules
         run: |
-          ansible-lint ansible/playbook.yml
+          ansible-lint -r custom_rules/ ansible/playbook.yml
