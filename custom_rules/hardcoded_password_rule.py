@@ -1,8 +1,7 @@
-import re
 from ansiblelint.rules import AnsibleLintRule
 
 class HardcodedPasswordRule(AnsibleLintRule):
-    id = "HardcodedPassword"
+    id = "Hardcoded password"
     shortdesc = "Hardcoded password or secret detected"
     description = (
         "Detects hardcoded passwords, tokens, or secrets in Ansible playbooks."
@@ -12,26 +11,26 @@ class HardcodedPasswordRule(AnsibleLintRule):
     version_added = "25.9.1"
     version_changed = "25.9.1"
 
-    def matchyaml(self, file, data):
+    def matchyaml(self, file):
         """
-        Called once for each parsed YAML document.
-        file: ansiblelint.file.Lintable
-        data: dict or list with the parsed YAML
+        Called once for each YAML file parsed by ansible-lint.
+        `file` is a Lintable object.
+        Parsed YAML content is available via `file.data`.
+        Return a list of tuples: [(path_or_line, message), ...]
         """
         results = []
+        yaml_data = getattr(file, "data", None)
+        if not yaml_data:
+            return results
 
         def scan(node, path=""):
             if isinstance(node, dict):
                 for key, value in node.items():
                     key_lower = str(key).lower()
 
-                    # detect suspicious variable names
-                    if any(x in key_lower for x in ["password", "secret", "token", "api_key", "key"]):
-                        if (
-                            isinstance(value, str)
-                            and value.strip()
-                            and not value.strip().startswith("$ANSIBLE_VAULT")
-                        ):
+                    # Detect suspicious keys
+                    if any(word in key_lower for word in ["password", "secret", "token", "api_key", "key"]):
+                        if isinstance(value, str) and value.strip() and not value.strip().startswith("$ANSIBLE_VAULT"):
                             msg = f"Hardcoded secret found: {key} = {value}"
                             results.append((path or key, msg))
 
@@ -41,5 +40,5 @@ class HardcodedPasswordRule(AnsibleLintRule):
                 for i, item in enumerate(node):
                     scan(item, f"{path}[{i}]")
 
-        scan(data)
+        scan(yaml_data)
         return results
