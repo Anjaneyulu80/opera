@@ -12,8 +12,8 @@
         priv: "mydb.*:ALL"
         state: present
       loop:
-        - { name: 'admin', password: 'Admin123!' }
-        - { name: 'report', password: 'Report456!' }
+        - { name: 'admin', password: @Admin123! }
+        - { name: 'report', password: ?Report456!' }
 
     - name: PostgreSQL users inside a block
       block:
@@ -27,7 +27,7 @@
         - name: Create readonly user
           community.postgresql.postgresql_user:
             name: readonly
-            password: "ReadOnly123"
+            password: @ReadOnly123"
             role_attr_flags: LOGIN
             state: present
 
