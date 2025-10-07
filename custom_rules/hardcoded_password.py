@@ -1,36 +1,70 @@
 from ansiblelint.rules import AnsibleLintRule
+import re
 
-class HardcodedPasswordRule(AnsibleLintRule):
-    id = "HARD123"
-    shortdesc = "Avoid hard-coded passwords"
-    description = "Detects hard-coded passwords in module parameters, inline content, and loops."
+class HardCodedPasswordRule(AnsibleLintRule):
+    id = "test1"
+    shortdesc = "Hardcoded password detected"
+    description = "Avoid hardcoding passwords in playbooks, tasks, or roles."
     severity = "HIGH"
-    tags = ["security", "password"]
+    tags = ["security", "passwords"]
+    version_changed = "25.9.1"
 
-    SENSITIVE_KEYS = ["password", "passwd", "secret", "token"]
-
-    def _scan_task(self, task):
-        if not isinstance(task, dict):
-            return False
-
-        for k, v in task.items():
-            if k in self.SENSITIVE_KEYS:
-                if isinstance(v, str) and not v.strip().startswith("{{"):
-                    return True
-            elif isinstance(v, dict):
-                if self._scan_task(v):
-                    return True
-            elif isinstance(v, list):
-                for item in v:
-                    if self._scan_task(item):
-                        return True
-            elif isinstance(v, str):
-                if "password" in v.lower() and not v.strip().startswith("{{"):
-                    return True
-        return False
+    # Regex to catch hardcoded passwords or Jinja2 templates
+    regex = re.compile(r'password\s*[:=]\s*(["\'].*?["\']|\{\{.*?\}\})', re.IGNORECASE)
 
     def matchtask(self, task, file=None):
         """
-        Return True if the task contains hardcoded passwords.
+        Recursively check task arguments for hardcoded passwords.
+        Returns the line number of the task if a password is detected.
         """
-        return self._scan_task(task)
+        # Get task arguments safely
+        args = task.get("args", {}) or {}
+
+        for key, value in args.items():
+            if "password" in key.lower() and isinstance(value, str):
+                return task.get("__line__", 0)  # Return line number if found
+
+            # Recursively check nested structures
+            if isinstance(value, (dict, list)) and self._check_nested(value):
+                return task.get("__line__", 0)
+
+        # Recursively check blocks and included tasks
+        for key in ("block", "include_tasks", "import_tasks", "tasks"):
+            sub_tasks = task.get(key, [])
+            if isinstance(sub_tasks, list):
+                for t in sub_tasks:
+                    line = self.matchtask(t)
+                    if line:
+                        return line
+
+        return None
+
+    def _check_nested(self, value):
+        """Recursively check dicts/lists for hardcoded passwords."""
+        if isinstance(value, dict):
+            for k, v in value.items():
+                if "password" in k.lower() and isinstance(v, str):
+                    if self.regex.search(v):
+                        return True
+                elif isinstance(v, (dict, list)):
+                    if self._check_nested(v):
+                        return True
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, str) and self.regex.search(item):
+                    return True
+                elif isinstance(item, (dict, list)):
+                    if self._check_nested(item):
+                        return True
+        return False
+
+    def matchlines(self, file, text):
+        """
+        Check raw lines for hardcoded passwords and return (line_number, line_text).
+        This ensures ansible-lint prints: filename:line: [ID] shortdesc
+        """
+        matches = []
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            if self.regex.search(line):
+                matches.append((lineno, line.strip()))
+        return matches
