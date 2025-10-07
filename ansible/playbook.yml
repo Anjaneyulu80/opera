@@ -7,12 +7,13 @@
     - name: Create database user with hard-coded password
       community.mysql.mysql_user:
         name: "admin"
-        password: "P@ssw0rd123"
+        password: P@ssw0rd123"
+        password: test123@
         priv: "mydb.*:ALL"
         state: present
 
     - name: Create a file with a hard-coded password
       ansible.builtin.copy:
         dest: "/tmp/secret.txt"
-        content: "DB password is P@ssw0rd123"
+        content: DB password is P@ssw0rd123
         mode: '0600'
