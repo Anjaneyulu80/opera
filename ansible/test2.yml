@@ -1,0 +1,8 @@
+- name: Password defined in vars
+  hosts: localhost
+  vars:
+    db_password: "MyDBPass!"
+  tasks:
+    - name: Print variable
+      ansible.builtin.debug:
+        msg: "Database password is {{ db_password }}"
