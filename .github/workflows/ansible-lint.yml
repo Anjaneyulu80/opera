@@ -27,5 +27,5 @@ jobs:
       - name: Run ansible-lint with custom rules
         env:
           ANSIBLE_LINT_RULES: ./custom_rules   # 👈 Load custom rules via env variable
-        run: |
-          ansible-lint -r custom_rules/hardcoded_password.py ansible/playbook.yml
+        run: ansible-lint -v ansible/playbook.yml
+
