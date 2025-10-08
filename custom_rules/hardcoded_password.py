@@ -9,6 +9,7 @@ class HardCodedPasswordRule(AnsibleLintRule):
     severity = "HIGH"
     tags = ["security", "passwords"]
     version_added = "25.9.1"
+    version_changed = "25.9.1"
 
     regex = re.compile(r"password\s*[:=]\s*(?:['\"].*?['\"]|\{\{.*?\}\})", re.IGNORECASE)
 
