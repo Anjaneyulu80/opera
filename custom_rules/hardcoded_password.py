@@ -1,7 +1,5 @@
 from ansiblelint.rules import AnsibleLintRule, MatchError
 import re
-
-
 class HardCodedPasswordRule(AnsibleLintRule):
     id = "CUSTOM001"
     shortdesc = "Hardcoded password detected"
