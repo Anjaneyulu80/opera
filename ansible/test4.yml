@@ -1,0 +1,9 @@
+- name: Using variable instead of hardcoded password
+  hosts: localhost
+  gather_facts: false
+  vars:
+    app_password: "{{ vault_app_password }}"
+  tasks:
+    - name: Show masked password
+      ansible.builtin.debug:
+        msg: "Password is {{ app_password }}"
