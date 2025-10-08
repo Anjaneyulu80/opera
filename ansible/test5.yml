@@ -1,0 +1,9 @@
+- name: Block-style password
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Hardcoded password in a block
+      ansible.builtin.debug:
+        msg: |
+          database_user: admin
+          database_password: "SuperSecret!"
