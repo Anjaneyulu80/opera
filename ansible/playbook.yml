@@ -1,7 +1,8 @@
-- name: Demo playbook
+- name: Password defined in vars
   hosts: localhost
-  gather_facts: false
+  vars:
+    db_password: "MyDBPass!"
   tasks:
-    - name: Hardcoded password example
+    - name: Print variable
       ansible.builtin.debug:
-        msg: "pwd: 'MySecret123'"
+        msg: "Database password is {{ db_password }}"
