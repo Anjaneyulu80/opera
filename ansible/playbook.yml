@@ -1,8 +1,8 @@
-- name: Password defined in vars
+- name: Hardcoded password in user module
   hosts: localhost
-  vars:
-    db_password: "MyDBPass!"
+  gather_facts: false
   tasks:
-    - name: Print variable
-      ansible.builtin.debug:
-        msg: "Database password is {{ db_password }}"
+    - name: Create a user with password
+      ansible.builtin.user:
+        name: testuser
+        password: "SecretPass123"
