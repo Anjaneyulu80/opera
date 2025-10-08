@@ -9,7 +9,6 @@ class HardCodedPasswordRule(AnsibleLintRule):
     description = "Avoid hardcoding passwords in playbooks, tasks, or roles."
     severity = "HIGH"
     tags = ["security", "passwords"]
-    version_added = "25.9.1"
 
     _regex = re.compile(
         r"password\s*[:=]\s*(?:['\"].*?['\"]|\S+)",
