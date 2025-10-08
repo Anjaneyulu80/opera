@@ -9,22 +9,22 @@ class HardCodedPasswordRule(AnsibleLintRule):
     severity = "HIGH"
     tags = ["security", "passwords"]
     version_added = "25.9.1"
-    version_changed = "25.9.1"
 
-    regex = re.compile(r"password\s*[:=]\s*(?:['\"].*?['\"]|\{\{.*?\}\})", re.IGNORECASE)
+    _regex = re.compile(r"password\s*[:=]\s*(?:['\"].*?['\"]|\{\{.*?\}\})",
+                        re.IGNORECASE)
 
     def matchlines(self, file, text):
-        """Detect hardcoded passwords and return MatchError objects with line info."""
-        results = []
+        """Return list of MatchError objects so rule ID appears in output."""
+        matches = []
+        path = file.get("path")
         for lineno, line in enumerate(text.splitlines(), start=1):
-            if self.regex.search(line):
-                results.append(
+            if self._regex.search(line):
+                matches.append(
                     MatchError(
-                        rule=self,
-                        filename=file["path"],
+                        rule=self,                 # tells Ansible-Lint which rule
+                        filename=path,
                         linenumber=lineno,
                         message=self.shortdesc,
-                        tag="security",
                     )
                 )
-        return results
+        return matches
