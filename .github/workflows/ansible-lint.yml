@@ -25,7 +25,7 @@ jobs:
           pip install ansible ansible-lint
 
       - name: Run ansible-lint with custom rules
-        run: ansible-lint -p ansible/
+        run: ansible-lint  ansible/
 
 
 
