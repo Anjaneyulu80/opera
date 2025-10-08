@@ -1,29 +1,29 @@
-from ansiblelint.rules import AnsibleLintRule
+from ansiblelint.rules import AnsibleLintRule, MatchError
 import re
 
 
 class HardCodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM009"
+    id = "CUSTOM001"
     shortdesc = "Hardcoded password detected"
     description = "Avoid hardcoding passwords in playbooks, tasks, or roles."
     severity = "HIGH"
     tags = ["security", "passwords"]
     version_added = "25.9.1"
-    version_changed = "25.9.1"
 
-    # Match passwords like:
-    #   password: "123"
-    #   password = 'abc'
-    #   password: {{ something }}
-    regex = re.compile(r'password\s*[:=]\s*(["\'].*?["\']|\{\{.*?\}\})', re.IGNORECASE)
+    regex = re.compile(r"password\s*[:=]\s*(?:['\"].*?['\"]|\{\{.*?\}\})", re.IGNORECASE)
 
     def matchlines(self, file, text):
-        """
-        Detect hardcoded passwords by scanning raw lines.
-        Return a list of (line_number, line_content) tuples.
-        """
+        """Detect hardcoded passwords and return MatchError objects with line info."""
         results = []
         for lineno, line in enumerate(text.splitlines(), start=1):
             if self.regex.search(line):
-                results.append((lineno, line.strip()))
+                results.append(
+                    MatchError(
+                        rule=self,
+                        filename=file["path"],
+                        linenumber=lineno,
+                        message=self.shortdesc,
+                        tag="security",
+                    )
+                )
         return results
