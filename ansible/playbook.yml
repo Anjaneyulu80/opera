@@ -5,3 +5,4 @@
     - name: Hardcoded password example
       ansible.builtin.debug:
         msg: "password: 'MySecret123'"
+         msg: password: 'Sample4u'
