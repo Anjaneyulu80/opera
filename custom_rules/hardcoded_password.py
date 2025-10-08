@@ -12,11 +12,12 @@ class HardCodedPasswordRule(AnsibleLintRule):
     version_added = "25.9.1"
 
     _regex = re.compile(
-        r"password\s*[:=]\s*(?:['\"].*?['\"]|\S+)", re.IGNORECASE
+        r"password\s*[:=]\s*(?:['\"].*?['\"]|\S+)",
+        re.IGNORECASE,
     )
 
     def matchlines(self, lintable) -> list[MatchError]:
-        """Return MatchError objects for hardcoded passwords."""
+        """Detect hardcoded passwords and return MatchError objects."""
         results = []
         for lineno, line in enumerate(lintable.content.splitlines(), start=1):
             if self._regex.search(line):
@@ -24,8 +25,8 @@ class HardCodedPasswordRule(AnsibleLintRule):
                     MatchError(
                         rule=self,
                         message=self.shortdesc,
-                        filename=lintable.path,
-                        linenumber=lineno,
+                        path=lintable.path,
+                        lineno=lineno,
                     )
                 )
         return results
