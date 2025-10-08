@@ -3,5 +3,5 @@
   gather_facts: false
   tasks:
     - name: Hardcoded password example
-      debug:
+      ansible.builtin.debug:
         msg: "password: 'MySecret123'"
