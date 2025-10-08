@@ -3,7 +3,7 @@ from ansiblelint.errors import MatchError
 import re
 
 class HardCodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM001"
+    id = "ANSIBLE002"
     shortdesc = "Hardcoded password detected"
     description = "Avoid hardcoding passwords in playbooks, tasks, or roles."
     severity = "HIGH"
