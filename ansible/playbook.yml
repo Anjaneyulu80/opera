@@ -4,4 +4,4 @@
   tasks:
     - name: Hardcoded password example
       debug:
-        msg: "password: 'MySecret123'"
+        msg: "password: 'MySecret123
