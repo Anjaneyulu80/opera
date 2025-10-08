@@ -3,12 +3,13 @@ import re
 
 
 class HardCodedPasswordRule(AnsibleLintRule):
-    id = "CUSTOM001"
+    id = "CUSTOM009"
     shortdesc = "Hardcoded password detected"
     description = "Avoid hardcoding passwords in playbooks, tasks, or roles."
     severity = "HIGH"
     tags = ["security", "passwords"]
     version_added = "25.9.1"
+    version_changed = "25.9.1"
 
     # Match passwords like:
     #   password: "123"
