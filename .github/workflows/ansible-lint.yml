@@ -37,7 +37,7 @@ jobs:
           ANSIBLE_LINT_RULES: ./custom_rules
         run: |
           echo " Running ansible-lint using ansible-lint.yml configuration..."
-          ansible-lint -p
+          ansible-lint -p custom_rules/
 
 
 
