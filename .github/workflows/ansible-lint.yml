@@ -23,9 +23,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install ansible ansible-lint
-
-      - name: Run ansible-lint (including custom rules)
-        run: ansible-lint  ansible/
     
       - name: Make run-lint.sh executable
         run: chmod +x ./run-lint.sh
