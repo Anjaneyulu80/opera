@@ -24,14 +24,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible ansible-lint
 
-      - name: Run yamllint on all .yml and .yaml files
-        run: |
-          echo "Running yamllint on all YAML/YML files..."
-          find . -type f \( -name "*.yaml" -o -name "*.yml" \) -exec yamllint {} +
-          continue-on-error: true
-
       - name: Run ansible-lint (including custom rules)
         run: ansible-lint  ansible/
+    
+      - name: Make run-lint.sh executable
+        run: chmod +x ./run-lint.sh
+
+      - name: Run lint checks
+        run: ./run-lint.sh
 
 
 
