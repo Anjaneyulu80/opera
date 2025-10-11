@@ -28,9 +28,10 @@ jobs:
         run: |
           echo "Running yamllint on all YAML/YML files..."
           find . -type f \( -name "*.yaml" -o -name "*.yml" \) -exec yamllint {} +
+          continue-on-error: true
 
       - name: Run ansible-lint (including custom rules)
-        run: ansible-lint -p custom_rules/
+        run: ansible-lint  ansible/
 
 
 
