@@ -24,8 +24,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible ansible-lint
 
-      - name: Run ansible-lint with custom rules
-        run: ansible-lint  ansible/
+      #  Lint YAML syntax first
+      - name: Run yamllint on all .yml and .yaml files
+        run: |
+          echo "🔍 Running yamllint on all YAML/YML files..."
+          find . -type f \( -name "*.yaml" -o -name "*.yml" \) -exec yamllint {} +
+        continue-on-error: false
+
+      # Run ansible-lint with custom rules
+      - name: Run ansible-lint (including custom rules)
+        env:
+          ANSIBLE_LINT_RULES: ./custom_rules
+        run: |
+          echo " Running ansible-lint using ansible-lint.yml configuration..."
+          ansible-lint -p
+
 
 
 
