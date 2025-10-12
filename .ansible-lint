@@ -1,1 +1,3 @@
-{}
+rulesdir:
+  - ./custom_rules
+
