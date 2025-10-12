@@ -24,12 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ansible ansible-lint yamllint
-
-      - name: Verify installations
-        run: |
-          ansible-lint --version
-          yamllint --version
+          pip install ansible ansible-lint 
 
       - name: Make run-lint.sh executable
         run: chmod +x ./run-lint.sh
