@@ -1,4 +1,4 @@
-name: YAML + Ansible Lint (with Custom Rule)
+name: Ansible Lint & YAML Validation
 
 on:
   push:
@@ -6,28 +6,25 @@ on:
   pull_request:
     branches: [ main ]
 
-
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: Run yamllint + ansible-lint
 
     steps:
-      - name: Checkout repository
+      - name: 📦 Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: 🐍 Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: 🧰 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ansible ansible-lint 
+          pip install ansible ansible-lint yamllint
 
-      - name: Make run-lint.sh executable
-        run: chmod +x ./run-lint.sh
-
-      - name: Run lint checks
-        run: ./run-lint.sh
+      - name: 🔍 Run YAML & Ansible lint checks
+        run: |
+          chmod +x run-lint.sh
+          ./run-lint.sh
