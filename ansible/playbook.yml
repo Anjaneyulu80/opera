@@ -1,8 +1,9 @@
-- name: Hardcoded password in user module
-  hosts: localhost
+---
+- name: Hello World Playbook
+  hosts: all
   gather_facts: false
+
   tasks:
-    - name: Create a user with password
-      ansible.builtin.user:
-        name: testuser
-        password: "SecretPass123"
+    - name: Print Hello World
+      ansible.builtin.debug:
+        msg: "Hello, World!"
