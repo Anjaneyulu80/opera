@@ -1,30 +1,43 @@
-name: Ansible Lint & YAML Validation
+---
+name: Ansible Lint All YML Files
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
-  lint:
+  ansible-lint:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📦 Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐍 Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v4
 
-      - name: 🧰 Install dependencies
+      - name: Install Ansible and ansible-lint
         run: |
-          python -m pip install --upgrade pip
-          pip install ansible ansible-lint yamllint
+          python3 -m pip install --upgrade pip
+          python3 -m ipip nstall ansible ansible-lint
+		  
+	  - name: Add pip in to PATH
+        run: | echo "$HOME/.local/bin" >> $GITHUB_PATH
+		
+      - name: Find all YML files
+        run: find . -type f\(-name "*.yml -o -name "*.yaml" \)>yml_files.txt
+		
+      - name: Run ansible-lint on all YML files
+        run: | 
+          while IFS= read -r file; do
+            echo "Linting $file"
+            ansible-lint "$file"
+          done < yml_files.txt			
 
-      - name: 🔍 Run YAML & Ansible lint checks
-        run: |
-          chmod +x run-lint.sh
-          ./run-lint.sh
+      - name: Run ansible-lint with custom rules
+        run: ansible-lint -p ansible/playbook.yml
+           
+		   
+		   
+         ansible-lint  playbooks/
