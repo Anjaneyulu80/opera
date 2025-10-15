@@ -1,7 +1,0 @@
-- name: Hardcoded password example
-  hosts: localhost
-  gather_facts: false
-  tasks:
-    - name: Example with debug
-      ansible.builtin.debug:
-        msg: "password: 'MySecret123'"
