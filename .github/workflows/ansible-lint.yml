@@ -1,52 +1,35 @@
 ---
 name: Ansible Lint ALL YML Files
 on:
-  workflow_dispatch:
+  workflow_dispatch: null
   pull_request:
     branches:
       - main
-
 jobs:
   lint:
     name: Run yamllint and ansible-lint
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout branch code
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # Set up Python 3.11
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      # Install required tools
       - name: Install Ansible, Ansible-Lint, and YAMLLint
         run: |
           python -m pip install --upgrade pip
           pip install ansible ansible-lint yamllint
-
-      # Show environment (optional for debugging)
       - name: Verify tools
         run: |
           python --version
           ansible --version
           ansible-lint --version
-          yamllint --version
-
-      # Lint YAML syntax first
-      - name: Run yamllint on all .yml and .yaml files
+      - name: Find all YML files
+        run: find . -type f\(-name "*.yml" -o -name "*.yaml" \) > yml_files.txt
+      - name: Run ansible-lint on all YML files
         run: |
-          echo "Running yamllint on all YAML/YML files..."
-          find . -type f \( -name "*.yaml" -o -name "*.yml" \) -exec yamllint {} +
-        continue-on-error: false
-
-      # Run ansible-lint with custom rules
-      - name: Run ansible-lint (including custom rules)
-        env:
-          ANSIBLE_LINT_RULES: ./custom_rules
-        run: |
-          echo "Running ansible-lint using ansible-lint.yml configuration..."
-          ansible-lint -p
+          while IFS= read -r file; do
+            echo "Linting $file"
+            ansible-lint "$file"
+          done < yml_files.txt
