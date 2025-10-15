@@ -1,8 +1,0 @@
-- name: Hardcoded password in user module
-  hosts: localhost
-  gather_facts: false
-  tasks:
-    - name: Create a user with password
-      ansible.builtin.user:
-        name: testuser
-        password: "SecretPass123"
