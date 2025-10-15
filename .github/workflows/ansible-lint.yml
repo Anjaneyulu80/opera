@@ -26,7 +26,7 @@ jobs:
           ansible --version
           ansible-lint --version
       - name: Find all YML files
-        run: find . -type f\(-name "*.yml" -o -name "*.yaml" \) > yml_files.txt
+        run: find . -type f \( -name "*.yml" -o -name "*.yaml" \) > yml_files.txt
       - name: Run ansible-lint on all YML files
         run: |
           while IFS= read -r file; do
