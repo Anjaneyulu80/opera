@@ -19,11 +19,11 @@ jobs:
 
       - name: Install Ansible and ansible-lint
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip nstall ansible ansible-lint
-		
+          python -m pip install --upgrade pip
+          python -m pip nstall ansible ansible-lint
+		  
       - name: Find all YML files
-        run: find . -type f\(-name "*.yml -o -name "*.yaml" \)>yml_files.txt
+        run: find . -type f\(-name "*.yml" -o -name "*.yaml" \) > yml_files.txt
 		
       - name: Run ansible-lint on all YML files
         run: | 
