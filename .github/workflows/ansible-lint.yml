@@ -1,7 +1,7 @@
 ---
 name: Ansible Lint ALL YML Files
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   pull_request:
     branches:
       - main
