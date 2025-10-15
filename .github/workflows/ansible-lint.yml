@@ -1,40 +1,52 @@
 ---
-name: Ansible Lint All YML Files
-
+name: Ansible Lint ALL YML Files
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  ansible-lint:
+  lint:
+    name: Run yamllint and ansible-lint
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout branch code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Set up Python 3.11
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-      - name: Install Ansible and ansible-lint
+      # Install required tools
+      - name: Install Ansible, Ansible-Lint, and YAMLLint
         run: |
           python -m pip install --upgrade pip
-          python -m pip nstall ansible ansible-lint
-		  
-      - name: Find all YML files
-        run: find . -type f\(-name "*.yml" -o -name "*.yaml" \) > yml_files.txt
-		
-      - name: Run ansible-lint on all YML files
-        run: | 
-          while IFS= read -r file; do
-            echo "Linting $file"
-            ansible-lint "$file"
-          done < yml_files.txt			
+          pip install ansible ansible-lint yamllint
 
-      - name: Run ansible-lint with custom rules
-        run: ansible-lint -p ansible/playbook.yml
-           
-		   
-		   
-         ansible-lint  playbooks/
+      # Show environment (optional for debugging)
+      - name: Verify tools
+        run: |
+          python --version
+          ansible --version
+          ansible-lint --version
+          yamllint --version
+
+      # Lint YAML syntax first
+      - name: Run yamllint on all .yml and .yaml files
+        run: |
+          echo "Running yamllint on all YAML/YML files..."
+          find . -type f \( -name "*.yaml" -o -name "*.yml" \) -exec yamllint {} +
+        continue-on-error: false
+
+      # Run ansible-lint with custom rules
+      - name: Run ansible-lint (including custom rules)
+        env:
+          ANSIBLE_LINT_RULES: ./custom_rules
+        run: |
+          echo "Running ansible-lint using ansible-lint.yml configuration..."
+          ansible-lint -p
