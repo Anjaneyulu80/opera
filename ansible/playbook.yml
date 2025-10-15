@@ -1,7 +1,8 @@
-- name: Example playbook
+- name: Hardcoded password in user module
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Example task with hardcoded password
-      ansible.builtin.debug:
-        msg: "password='MySuperSecret123'"
+    - name: Create a user with password
+      ansible.builtin.user:
+        name: testuser
+        password: "SecretPass123"
