@@ -1,10 +1,11 @@
-name: Inventory Pipeline with App ID Validation
+name: Inventory Update Pipeline
 
+# Trigger when a user modifies inventory files or manually triggers workflow
 on:
   push:
     paths:
-      - 'inventory/**'
-  workflow_dispatch:
+      - 'inventory/**'        # only triggers if files under inventory/ change
+  workflow_dispatch:          # allows manual triggering
 
 jobs:
   update-inventory:
@@ -12,9 +13,11 @@ jobs:
     outputs:
       approval_id: ${{ steps.generate.outputs.approval_id }}
     steps:
+      # 1. Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2. Generate a unique approval ID
       - name: Generate Approval ID
         id: generate
         run: |
@@ -22,38 +25,37 @@ jobs:
           echo "approval_id=$APPROVAL_ID" >> $GITHUB_OUTPUT
           echo "Generated approval ID: $APPROVAL_ID"
 
-      - name: Fetch App IDs from Central Registry
-        id: fetch_apps
+      # 3. Define allowed hostnames (or app IDs)
+      - name: Define Allowed Hosts
+        id: define_hosts
         run: |
-          echo "Fetching App IDs from central registry..."
-          # Simulate API call to fetch app IDs
-          APP_IDS=("app01" "app02" "app03")
-          echo "APP_IDS=${APP_IDS[@]}" >> $GITHUB_ENV
-          echo "Fetched App IDs: ${APP_IDS[@]}"
+          HOSTNAMES=("inventory.example.com" "orders.example.com" "shipping.example.com")
+          echo "HOSTNAMES=${HOSTNAMES[@]}" >> $GITHUB_ENV
+          echo "Allowed hosts: ${HOSTNAMES[@]}"
 
-      - name: Validate Inventory Against App IDs
+      # 4. Validate modified inventory against allowed hosts
+      - name: Validate Inventory
         run: |
-          echo "Validating inventory..."
-          # Example: check if inventory contains only allowed apps
-          INVENTORY_APPS=("app01" "app04")  # Example inventory reference
-          INVALID_APPS=()
-          for app in "${INVENTORY_APPS[@]}"; do
-            if [[ ! " ${APP_IDS[@]} " =~ " ${app} " ]]; then
-              INVALID_APPS+=("$app")
+          echo "Validating modified inventory..."
+          # Example inventory content from user modification
+          INVENTORY_HOSTS=("inventory.example.com" "unknown.example.com")
+          INVALID_HOSTS=()
+          for host in "${INVENTORY_HOSTS[@]}"; do
+            if [[ ! " ${HOSTNAMES[@]} " =~ " ${host} " ]]; then
+              INVALID_HOSTS+=("$host")
             fi
           done
 
-          if [ ${#INVALID_APPS[@]} -gt 0 ]; then
-            echo "Error: Inventory contains invalid apps: ${INVALID_APPS[@]}"
+          if [ ${#INVALID_HOSTS[@]} -gt 0 ]; then
+            echo "Error: Inventory contains invalid hosts: ${INVALID_HOSTS[@]}"
             exit 1
           fi
-
           echo "Inventory validated successfully."
 
   admin-approval:
     runs-on: ubuntu-latest
     needs: update-inventory
-    environment: Inventory Approval   # pauses until admin approves
+    environment: Inventory Approval   # workflow pauses here for admin approval
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -62,7 +64,7 @@ jobs:
         run: |
           echo "Admin approval required for inventory update."
           echo "Approval ID: ${{ needs.update-inventory.outputs.approval_id }}"
-          echo "Validated App IDs: ${{ env.APP_IDS }}"
+          echo "Validated Hosts: ${{ env.HOSTNAMES }}"
 
   deploy-inventory:
     runs-on: ubuntu-latest
@@ -73,5 +75,5 @@ jobs:
 
       - name: Deploy Inventory
         run: |
-          echo "Deploying inventory changes to apps: ${{ env.APP_IDS }}"
-          # Replace this with your actual deployment logic
+          echo "Deploying inventory changes to hosts: ${{ env.HOSTNAMES }}"
+          # Add your real deployment commands here
