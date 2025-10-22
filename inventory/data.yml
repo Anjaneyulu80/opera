@@ -1,16 +1,1 @@
-items:
-  - id: item001
-    name: Laptop
-    category: Electronics
-    quantity: 15
-    price: 1200.50
-  - id: item002
-    name: Office Chair
-    category: Furniture
-    quantity: 30
-    price: 150.75
-  - id: item003
-    name: Notebook
-    category: Stationery
-    quantity: 0
-    price: 2.50
+HOSTNAMES=("inventory.example.com" "orders.example.com" "shipping.example.com" "unknown.example.com")
