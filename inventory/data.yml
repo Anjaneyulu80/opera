@@ -12,5 +12,5 @@ items:
   - id: item003
     name: Notebook
     category: Stationery
-    quantity: 200
+    quantity: 0
     price: 2.50
