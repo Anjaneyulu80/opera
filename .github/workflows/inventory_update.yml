@@ -29,7 +29,7 @@ jobs:
           import yaml
 
           # Load YAML inventory
-          with open('inventory/data.yaml') as f:
+          with open('inventory/data.yml') as f:
               data = yaml.safe_load(f)
 
           # Sum quantities of all items
