@@ -1,0 +1,77 @@
+name: Inventory Pipeline with App ID Validation
+
+on:
+  push:
+    paths:
+      - 'inventory/**'
+  workflow_dispatch:
+
+jobs:
+  update-inventory:
+    runs-on: ubuntu-latest
+    outputs:
+      approval_id: ${{ steps.generate.outputs.approval_id }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate Approval ID
+        id: generate
+        run: |
+          APPROVAL_ID=$(uuidgen)
+          echo "approval_id=$APPROVAL_ID" >> $GITHUB_OUTPUT
+          echo "Generated approval ID: $APPROVAL_ID"
+
+      - name: Fetch App IDs from Central Registry
+        id: fetch_apps
+        run: |
+          echo "Fetching App IDs from central registry..."
+          # Simulate API call to fetch app IDs
+          APP_IDS=("app01" "app02" "app03")
+          echo "APP_IDS=${APP_IDS[@]}" >> $GITHUB_ENV
+          echo "Fetched App IDs: ${APP_IDS[@]}"
+
+      - name: Validate Inventory Against App IDs
+        run: |
+          echo "Validating inventory..."
+          # Example: check if inventory contains only allowed apps
+          INVENTORY_APPS=("app01" "app04")  # Example inventory reference
+          INVALID_APPS=()
+          for app in "${INVENTORY_APPS[@]}"; do
+            if [[ ! " ${APP_IDS[@]} " =~ " ${app} " ]]; then
+              INVALID_APPS+=("$app")
+            fi
+          done
+
+          if [ ${#INVALID_APPS[@]} -gt 0 ]; then
+            echo "Error: Inventory contains invalid apps: ${INVALID_APPS[@]}"
+            exit 1
+          fi
+
+          echo "Inventory validated successfully."
+
+  admin-approval:
+    runs-on: ubuntu-latest
+    needs: update-inventory
+    environment: Inventory Approval   # pauses until admin approves
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Show Approval Details
+        run: |
+          echo "Admin approval required for inventory update."
+          echo "Approval ID: ${{ needs.update-inventory.outputs.approval_id }}"
+          echo "Validated App IDs: ${{ env.APP_IDS }}"
+
+  deploy-inventory:
+    runs-on: ubuntu-latest
+    needs: admin-approval
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy Inventory
+        run: |
+          echo "Deploying inventory changes to apps: ${{ env.APP_IDS }}"
+          # Replace this with your actual deployment logic
