@@ -1,27 +1,110 @@
-name: Inventory Update
+name: Inventory Summary
 
 on:
   push:
     paths:
-      - 'inventory/**'  # Only trigger when inventory files change
+      - 'inventory/**'
   workflow_dispatch:
 
 jobs:
-  request-approval:
+  summarize-inventory:
     runs-on: ubuntu-latest
-    outputs:
-      approval-id: ${{ steps.generate.outputs.approval_id }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Generate Approval ID
-        id: generate
-        run: |
-          # Generate a unique approval ID
-          echo "approval_id=$(uuidgen)" >> $GITHUB_OUTPUT
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-      - name: Notify Admin
+      - name: Install dependencies
         run: |
-          echo "Inventory update requested. Approval ID: ${{ steps.generate.outputs.approval_id }}"
-          # Could integrate Slack/Email notification here
+          pip install pandas pyyaml
+
+      - name: Summarize JSON inventory
+        run: |
+          echo "JSON Inventory Summary:"
+          python - << 'EOF'
+import json
+with open('inventory/items.json') as f:
+    items = json.load(f)
+total_items = sum(item['quantity'] for item in items)
+print(f"Total items in JSON inventory: {total_items}")
+EOF
+
+      - name: Summarize CSV inventory
+        run: |
+          echo "CSV Inventory Summary:"
+          python - << 'EOF'
+import pandas as pd
+df = pd.read_csv('inventory/products.csv')
+total_items = df['quantity'].sum()
+print(f"Total items in CSV inventory: {total_items}")
+EOF
+
+      - name: Summarize YAML inventory
+        run: |
+          echo "YAML Inventory Summary:"
+          python - << 'EOF'
+import yaml
+with open('inventory/data.yaml') as f:
+    data = yaml.safe_load(f)
+total_items = sum(item['quantity'] for item in data['items'])
+print(f"Total items in YAML inventory: {total_items}")
+EOF
+name: Inventory Summary
+
+on:
+  push:
+    paths:
+      - 'inventory/**'
+  workflow_dispatch:
+
+jobs:
+  summarize-inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas pyyaml
+
+      - name: Summarize JSON inventory
+        run: |
+          echo "JSON Inventory Summary:"
+          python - << 'EOF'
+import json
+with open('inventory/items.json') as f:
+    items = json.load(f)
+total_items = sum(item['quantity'] for item in items)
+print(f"Total items in JSON inventory: {total_items}")
+EOF
+
+      - name: Summarize CSV inventory
+        run: |
+          echo "CSV Inventory Summary:"
+          python - << 'EOF'
+import pandas as pd
+df = pd.read_csv('inventory/products.csv')
+total_items = df['quantity'].sum()
+print(f"Total items in CSV inventory: {total_items}")
+EOF
+
+      - name: Summarize YAML inventory
+        run: |
+          echo "YAML Inventory Summary:"
+          python - << 'EOF'
+import yaml
+with open('inventory/data.yaml') as f:
+    data = yaml.safe_load(f)
+total_items = sum(item['quantity'] for item in data['items'])
+print(f"Total items in YAML inventory: {total_items}")
+EOF
